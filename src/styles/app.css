@@ -393,6 +393,11 @@ table { border-collapse: collapse; width: 100%; }
   .toasts { left: 14px; right: 14px; bottom: 14px; }
   .toast { max-width: none; }
 }
+@media (max-width: 600px) {
+  /* Data tables scroll sideways inside their wrapper instead of crushing columns */
+  .table-wrap .table { min-width: 540px; }
+  .table-wrap .items-table { min-width: 620px; }
+}
 @media (max-width: 480px) {
   :root { --content-x: 16px; }
   .stat-grid { gap: 12px; }

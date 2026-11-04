@@ -5,7 +5,6 @@ import { Confirm, Field, Modal, Notice, PageHeader, Panel, Tag, type TagTone } f
 import { computeTotals, formatRand, hasErrors, parseNumber, toCents, validateLine } from '../../lib/money';
 import { formatDate, formatDateTime, todayIso } from '../../lib/dates';
 import { invoiceDerived } from '../../lib/selectors';
-import { buildDocumentPdf } from '../../lib/pdf';
 import { newId, useStore } from '../../store/useStore';
 import type { Invoice, LineItem, Payment, Quotation } from '../../store/types';
 import LineItemsEditor from './LineItemsEditor';
@@ -94,9 +93,10 @@ function Editor({ kind, id }: { kind: Kind; id: string | undefined }) {
     navigate(kind === 'quotation' ? '/finance/quotations' : '/finance/invoices');
   };
 
-  const pdf = (mode: 'download' | 'print') => {
+  const pdf = async (mode: 'download' | 'print') => {
     setShowErrors(true);
     if (invalid) { store.toast('Fix the highlighted fields before generating a PDF.', 'err'); return; }
+    const { buildDocumentPdf } = await import('../../lib/pdf'); // lazy: keeps jsPDF out of the main bundle
     const doc = buildDocumentPdf(kind, draft, customer, store.settings.companyName);
     if (mode === 'download') { doc.save(`${draft.number}-DEMO.pdf`); store.toast(`${draft.number}-DEMO.pdf generated (fictional, watermarked).`); }
     else { doc.autoPrint(); window.open(doc.output('bloburl'), '_blank'); }

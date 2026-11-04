@@ -22,6 +22,8 @@ or real business data exist in the repository.
 
 | Date (SAST) | Commit | Workflow run | Result | Live checks performed |
 | --- | --- | --- | --- | --- |
+| 04 Nov 2026 23:45 | `143e530` | https://github.com/Ndumiso-Y/jnl-traders-business-system-demo/actions/runs/41918968121 | build ✓ deploy ✓ | Playwright `e2e/live.spec.ts` against the Pages URL: HTTP 200, Finance navigation, `#/fleet` deep link + reload, sidebar CSS applied, no 4xx, no console errors — **1 passed (3.9s)**. |
+| 04 Nov 2026 23:30 | `af6e7b5` | https://github.com/Ndumiso-Y/jnl-traders-business-system-demo/actions/runs/41917014574 | build ✓ deploy ✓ | `curl` confirmed new JS bundle (`index-m00knJ8R.js`) served from the Pages URL. |
 | 04 Nov 2026 23:15 | `5602b85` | https://github.com/Ndumiso-Y/jnl-traders-business-system-demo/actions/runs/41913772772 | build ✓ deploy ✓ | `curl` → HTTP 200 for `/`, CSS (200, 23 181 B), JS (200, 366 001 B), favicon 200. Browser: opened `#/fleet` deep link, pressed F5 (hard refresh) — page re-rendered, sidebar + heading present, **no console errors**. |
 
 ## Blockers

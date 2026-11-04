@@ -4,7 +4,7 @@ import { IcoDownload } from '../../components/Icons';
 import { Empty, Notice, PageHeader, Panel, Stat } from '../../components/ui';
 import { formatRand } from '../../lib/money';
 import { formatDate, todayIso } from '../../lib/dates';
-import { buildStatementLines, buildStatementPdf } from '../../lib/pdf';
+import { buildStatementLines } from '../../lib/statement';
 import { useStore } from '../../store/useStore';
 
 export default function StatementsPage() {
@@ -20,8 +20,9 @@ export default function StatementsPage() {
   const custInvoices = useMemo(() => invoices.filter((i) => i.customerId === customerId), [invoices, customerId]);
   const statement = useMemo(() => buildStatementLines(custInvoices, payments), [custInvoices, payments]);
 
-  const download = () => {
+  const download = async () => {
     if (!customer) return;
+    const { buildStatementPdf } = await import('../../lib/pdf');
     buildStatementPdf(customer, custInvoices, payments, companyName, todayIso()).save(`STATEMENT-${customer.name.replace(/[^a-z0-9]+/gi, '-')}-DEMO.pdf`);
     toast('Statement PDF generated (fictional, watermarked).');
   };
