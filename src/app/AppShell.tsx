@@ -1,20 +1,12 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { IcoBag, IcoBell, IcoChart, IcoDoc, IcoHome, IcoLock, IcoMenu, IcoSearch, IcoSettings, IcoShield, IcoTruck, IcoUsers } from '../components/Icons';
+import { IcoBell, IcoMenu, IcoSearch, IcoSettings } from '../components/Icons';
+import { NAV } from './nav';
 import { Toasts } from '../components/ui';
 import { useStore } from '../store/useStore';
 import { ROLE_LABELS } from '../store/types';
 
-export const NAV = [
-  { to: '/', label: 'Overview', icon: IcoHome, crumb: 'Overview', end: true },
-  { to: '/finance', label: 'Finance', icon: IcoDoc, crumb: 'Finance' },
-  { to: '/procurement', label: 'Procurement', icon: IcoBag, crumb: 'Procurement' },
-  { to: '/ppe', label: 'PPE Requests', icon: IcoShield, crumb: 'PPE requests' },
-  { to: '/fleet', label: 'Fleet & Equipment', icon: IcoTruck, crumb: 'Fleet' },
-  { to: '/reports', label: 'Reports', icon: IcoChart, crumb: 'Reports' },
-  { to: '/people', label: 'People & Safety', icon: IcoUsers, crumb: 'People & Safety' },
-  { to: '/owner', label: 'Owner view', icon: IcoLock, crumb: 'Owner view' },
-];
+// NAV lives in nav.ts
 
 export default function AppShell() {
   const [open, setOpen] = useState(false);
