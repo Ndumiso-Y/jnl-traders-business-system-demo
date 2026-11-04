@@ -11,6 +11,13 @@ import CustomersPage from '../modules/finance/CustomersPage';
 import RequestsList from '../modules/requests/RequestsList';
 import RequestEditor from '../modules/requests/RequestEditor';
 import PurchaseOrdersPage from '../modules/requests/PurchaseOrdersPage';
+import FleetPage from '../modules/fleet/FleetPage';
+import AssetEditor from '../modules/fleet/AssetEditor';
+import ReportsPage from '../modules/reports/ReportsPage';
+import PeoplePage from '../modules/people/PeoplePage';
+import OwnerPage from '../modules/owner/OwnerPage';
+import SettingsPage from '../modules/settings/SettingsPage';
+import SearchPage from '../modules/search/SearchPage';
 
 export const routes: RouteObject[] = [
   {
@@ -36,12 +43,13 @@ export const routes: RouteObject[] = [
       { path: 'procurement/orders', element: <PurchaseOrdersPage /> },
       { path: 'ppe', element: <RequestsList kind="ppe" /> },
       { path: 'ppe/requests/:id', element: <RequestEditor kind="ppe" /> },
-      { path: 'fleet/*', element: <Placeholder kicker="Operations / Asset control" title="Fleet & equipment" subtitle="Keep assets organised, maintenance visible and important renewals on time." /> },
-      { path: 'reports/*', element: <Placeholder kicker="Finance / Reports" title="Reports" subtitle="Monthly aggregates driven by the demo records." /> },
-      { path: 'people/*', element: <Placeholder kicker="People / HR & Safety" title="People & safety" subtitle="Hiring, disciplinary and safety registers." /> },
-      { path: 'owner/*', element: <Placeholder kicker="Private / Owner oversight" title="Owner view" subtitle="Summary for the owner — simulated restriction only." /> },
-      { path: 'settings', element: <Placeholder kicker="Workspace / Settings" title="Settings & demo reset" subtitle="VAT default, simulated role and demo data reset." /> },
-      { path: 'search', element: <Placeholder kicker="Workspace / Search" title="Search" subtitle="Workspace search across records." /> },
+      { path: 'fleet', element: <FleetPage /> },
+      { path: 'fleet/:id', element: <AssetEditor /> },
+      { path: 'reports', element: <ReportsPage /> },
+      { path: 'people', element: <PeoplePage /> },
+      { path: 'owner', element: <OwnerPage /> },
+      { path: 'settings', element: <SettingsPage /> },
+      { path: 'search', element: <SearchPage /> },
       { path: '*', element: <Placeholder kicker="Workspace" title="Page not found" subtitle="That route does not exist in the demo." /> },
     ],
   },
