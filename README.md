@@ -8,9 +8,26 @@ built by Embark Digitals as a discovery prototype. It is **not** a production sy
 - The role switcher is a simulation for demonstration; a public static site cannot enforce real permissions.
 - No credentials, analytics or third-party services are embedded.
 
-## Live demo
+## Live demo (verified)
 
-See `docs/DEPLOYMENT_STATUS.md` for the verified status. (Updated after each verified deployment.)
+- **Pages URL:** https://ndumiso-y.github.io/jnl-traders-business-system-demo/
+- **Repository:** https://github.com/Ndumiso-Y/jnl-traders-business-system-demo
+- **Deploys:** GitHub Actions on every push to `main` (typecheck → unit tests → build → Pages). Status, run links and
+  the checks performed on each release are recorded in `docs/DEPLOYMENT_STATUS.md`.
+
+Open the URL in any modern browser. Use the role switcher (Requester / Manager / Finance / Owner) on the
+Procurement, PPE, People and Owner pages to walk through the approval workflow. Settings → Reset restores the
+fictional starting data.
+
+## Documentation
+
+| File | Contents |
+| --- | --- |
+| `docs/DEPLOYMENT_STATUS.md` | GitHub owner, repo, Pages method, verified releases, blockers |
+| `docs/DESIGN_LOCK.md` | Visual references, design tokens, screen map, deviations |
+| `docs/BUSINESS_SCOPE_AND_LIMITATIONS.md` | Demonstrated vs simulated vs future; unknowns; Zoom discovery questions |
+| `docs/QA_RESULTS.md` | Unit, browser and live-URL test results with real output; screenshot paths |
+| `qa/screenshots/` | Browser captures at 1440 / 1024 / 768 / 390 px |
 
 ## Run locally
 
@@ -24,6 +41,25 @@ npm run typecheck  # tsc
 npm run lint       # eslint
 npm run e2e        # Playwright browser tests (after: npx playwright install chromium)
 ```
+
+## How to resume development
+
+1. `git pull` then `npm install`.
+2. `npm run dev` and open the local URL above (hash routes, e.g. `#/finance/quotations`).
+3. Make changes; run `npm run typecheck && npm test && npm run e2e` (the e2e suite needs `npx playwright install chromium` once).
+4. Commit and push to `main`; the Pages workflow deploys automatically. Verify the live URL and add a row to
+   `docs/DEPLOYMENT_STATUS.md`.
+
+Source layout: `src/app` (shell, routes, nav) · `src/components` (shared UI) · `src/lib` (money, dates, selectors, PDF)
+· `src/store` (types, fictional seed, persisted zustand store) · `src/modules/*` (pages per module) · `tests/` (vitest)
+· `e2e/` (Playwright).
+
+## Limitations
+
+- Static frontend only: data lives in the browser's localStorage, per browser/device, with no sync or backup.
+- The role switcher is a simulation. The "owner-only" page is hidden by JavaScript, not protected.
+- PDFs are watermarked demonstration documents, not valid tax invoices. VAT 15% is a configurable demo default.
+- No login, email, payments, integrations or real records. See `docs/BUSINESS_SCOPE_AND_LIMITATIONS.md`.
 
 ## Stack
 

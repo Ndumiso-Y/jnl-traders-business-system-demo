@@ -200,6 +200,11 @@ table { border-collapse: collapse; width: 100%; }
 .action-card p { color: #7c817a; font-size: 13px; margin-top: 8px; }
 .action-card .foot { border-top: 1px solid #e6dfd1; margin-top: auto; padding-top: 16px; display: flex; justify-content: space-between; align-items: center; }
 
+/* Fleet illustration panel (mockup 02) */
+.fleet-illustration { background: var(--bg-subtle); border-radius: 14px; padding: 22px 28px 14px; position: relative; display: flex; justify-content: center; min-height: 240px; }
+.fleet-illustration svg { width: 100%; max-width: 560px; height: auto; }
+.fleet-caption { position: absolute; right: 18px; bottom: 16px; background: #fff; border: 1px solid var(--line); border-radius: 100px; padding: 7px 11px; font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+
 /* ---------- Tags ---------- */
 .tag { display: inline-flex; align-items: center; gap: 5px; background: var(--neutral-bg); color: var(--neutral-text); font-weight: 700; font-size: 10px; border-radius: 30px; padding: 6px 10px; white-space: nowrap; line-height: 1; }
 .tag.green { color: var(--ok-text); background: var(--ok-tag-bg); }
@@ -211,7 +216,7 @@ table { border-collapse: collapse; width: 100%; }
 .tag.outline { background: transparent; border: 1px solid var(--line-3); }
 
 /* ---------- Tables ---------- */
-.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; position: relative; }
 .table th { text-align: left; text-transform: uppercase; letter-spacing: 1px; color: #a2a8a1; font-size: 9px; font-weight: 700; padding: 14px 12px; border-bottom: 1px solid var(--line-2); white-space: nowrap; }
 .table td { padding: 15px 12px; border-bottom: 1px solid #f0f1ed; font-size: 12px; color: #606a61; vertical-align: middle; }
 .table tr:last-child td { border-bottom: 0; }
@@ -357,8 +362,8 @@ table { border-collapse: collapse; width: 100%; }
 @media (max-width: 1180px) {
   :root { --content-x: 28px; --sidebar-w: 232px; }
   .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .grid-2, .grid-3 { grid-template-columns: 1fr; }
-  .doc-grid { grid-template-columns: 1fr; }
+  .grid-2, .grid-3 { grid-template-columns: minmax(0, 1fr); }
+  .doc-grid { grid-template-columns: minmax(0, 1fr); }
   .search-box { width: 180px; }
   .hero { min-height: 200px; }
 }
@@ -374,10 +379,12 @@ table { border-collapse: collapse; width: 100%; }
   .content { padding-top: 22px; }
   .page-title { font-size: 27px; }
   .title-row { margin-bottom: 18px; }
-  .form-grid { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: minmax(0, 1fr); }
   .form-grid .span-2 { grid-column: span 1; }
-  .grid-2-even { grid-template-columns: 1fr; }
+  .grid-2-even { grid-template-columns: minmax(0, 1fr); }
   .hero { padding: 26px; }
+  .fleet-illustration { min-height: 0; padding: 16px 14px 44px; }
+  .fleet-caption { right: 10px; bottom: 10px; }
   .hero h2 { font-size: 26px; }
   .hero-mark { font-size: 120px; right: 10px; }
   .panel-pad { padding: 18px; }

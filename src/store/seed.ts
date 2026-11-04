@@ -39,15 +39,15 @@ export function buildSeed(): DataState {
 
   // --- Invoices across the last eight months (fictional) -------------------
   const invoiceSpecs: Array<{ n: number; cus: string; monthOffset: number; day: number; items: ReturnType<typeof li>[]; status: 'issued' | 'draft'; fromQuote?: string }> = [
-    { n: 201, cus: 'cus_1', monthOffset: -7, day: 6, items: [li('Sample equipment supply', 4, 1250), li('Site delivery (fictional)', 1, 850)], status: 'issued' },
-    { n: 202, cus: 'cus_2', monthOffset: -6, day: 12, items: [li('Demo consumables pack', 20, 310), li('Sample site service', 3, 500)], status: 'issued' },
-    { n: 203, cus: 'cus_3', monthOffset: -5, day: 3, items: [li('Illustrative hire — compactor', 5, 1400, 5)], status: 'issued' },
-    { n: 204, cus: 'cus_1', monthOffset: -4, day: 18, items: [li('Sample equipment supply', 6, 1250), li('Sample site service', 4, 500)], status: 'issued' },
-    { n: 205, cus: 'cus_4', monthOffset: -3, day: 9, items: [li('Demo transport (per load)', 12, 980)], status: 'issued' },
-    { n: 206, cus: 'cus_2', monthOffset: -2, day: 21, items: [li('Demo consumables pack', 30, 310, 10), li('Illustrative safety signage', 8, 275)], status: 'issued' },
-    { n: 207, cus: 'cus_3', monthOffset: -1, day: 7, items: [li('Illustrative hire — generator', 10, 1900)], status: 'issued' },
-    { n: 208, cus: 'cus_1', monthOffset: 0, day: 2, items: [li('Sample equipment supply', 8, 1250), li('Site delivery (fictional)', 2, 850)], status: 'issued' },
-    { n: 209, cus: 'cus_4', monthOffset: 0, day: 3, items: [li('Demo transport (per load)', 15, 980), li('Sample site service', 2, 500)], status: 'issued' },
+    { n: 201, cus: 'cus_1', monthOffset: -7, day: 6, items: [li('Sample equipment supply', 12, 1250), li('Site delivery (fictional)', 4, 850)], status: 'issued' },
+    { n: 202, cus: 'cus_2', monthOffset: -6, day: 12, items: [li('Demo consumables pack', 40, 310), li('Sample site service', 8, 500)], status: 'issued' },
+    { n: 203, cus: 'cus_3', monthOffset: -5, day: 3, items: [li('Illustrative hire — compactor', 12, 1400, 5)], status: 'issued' },
+    { n: 204, cus: 'cus_1', monthOffset: -4, day: 18, items: [li('Sample equipment supply', 16, 1250), li('Sample site service', 6, 500)], status: 'issued' },
+    { n: 205, cus: 'cus_4', monthOffset: -3, day: 9, items: [li('Demo transport (per load)', 18, 980)], status: 'issued' },
+    { n: 206, cus: 'cus_2', monthOffset: -2, day: 21, items: [li('Demo consumables pack', 45, 310, 10), li('Illustrative safety signage', 12, 275)], status: 'issued' },
+    { n: 207, cus: 'cus_3', monthOffset: -1, day: 7, items: [li('Illustrative hire — generator', 14, 1900)], status: 'issued' },
+    { n: 208, cus: 'cus_1', monthOffset: 0, day: 2, items: [li('Sample equipment supply', 10, 1250), li('Site delivery (fictional)', 2, 850)], status: 'issued' },
+    { n: 209, cus: 'cus_4', monthOffset: 0, day: 3, items: [li('Demo transport (per load)', 14, 980), li('Sample site service', 2, 500)], status: 'issued' },
   ];
 
   const invoices = invoiceSpecs.map((s) => {
@@ -71,13 +71,14 @@ export function buildSeed(): DataState {
   });
 
   // --- Payments (fictional): older invoices settled, recent ones open ------
+  const gross = (items: ReturnType<typeof li>[]) => Math.round(items.reduce((t, it) => t + it.qty * it.unitPrice * (1 - it.discountPct / 100), 0) * 1.15 * 100) / 100;
   const payments = [
-    { id: uid('pay'), invoiceId: 'inv_201', date: addDays(invoices[0].date, 21), amount: 5750 + 850 * 1.15, method: 'eft' as const, reference: 'DEMO-EFT-0001', createdAt: ts(200) },
-    { id: uid('pay'), invoiceId: 'inv_202', date: addDays(invoices[1].date, 25), amount: 8855, method: 'eft' as const, reference: 'DEMO-EFT-0002', createdAt: ts(170) },
-    { id: uid('pay'), invoiceId: 'inv_203', date: addDays(invoices[2].date, 14), amount: 7647.5, method: 'eft' as const, reference: 'DEMO-EFT-0003', createdAt: ts(140) },
-    { id: uid('pay'), invoiceId: 'inv_204', date: addDays(invoices[3].date, 30), amount: 10925, method: 'eft' as const, reference: 'DEMO-EFT-0004', createdAt: ts(100) },
-    { id: uid('pay'), invoiceId: 'inv_205', date: addDays(invoices[4].date, 18), amount: 13524, method: 'card' as const, reference: 'DEMO-CARD-0005', createdAt: ts(70) },
-    { id: uid('pay'), invoiceId: 'inv_206', date: addDays(invoices[5].date, 20), amount: 6000, method: 'eft' as const, reference: 'DEMO-EFT-0006 (part payment)', createdAt: ts(40) },
+    { id: uid('pay'), invoiceId: 'inv_201', date: addDays(invoices[0].date, 21), amount: gross(invoiceSpecs[0].items), method: 'eft' as const, reference: 'DEMO-EFT-0001', createdAt: ts(200) },
+    { id: uid('pay'), invoiceId: 'inv_202', date: addDays(invoices[1].date, 25), amount: gross(invoiceSpecs[1].items), method: 'eft' as const, reference: 'DEMO-EFT-0002', createdAt: ts(170) },
+    { id: uid('pay'), invoiceId: 'inv_203', date: addDays(invoices[2].date, 14), amount: gross(invoiceSpecs[2].items), method: 'eft' as const, reference: 'DEMO-EFT-0003', createdAt: ts(140) },
+    { id: uid('pay'), invoiceId: 'inv_204', date: addDays(invoices[3].date, 30), amount: gross(invoiceSpecs[3].items), method: 'eft' as const, reference: 'DEMO-EFT-0004', createdAt: ts(100) },
+    { id: uid('pay'), invoiceId: 'inv_205', date: addDays(invoices[4].date, 18), amount: gross(invoiceSpecs[4].items), method: 'card' as const, reference: 'DEMO-CARD-0005', createdAt: ts(70) },
+    { id: uid('pay'), invoiceId: 'inv_206', date: addDays(invoices[5].date, 20), amount: 9000, method: 'eft' as const, reference: 'DEMO-EFT-0006 (part payment)', createdAt: ts(40) },
   ];
   // Normalise payment amounts to cents precision.
   for (const p of payments) p.amount = Math.round(p.amount * 100) / 100;
@@ -192,9 +193,10 @@ export function buildSeed(): DataState {
   ];
 
   // --- Expenses (fictional operating costs) ---------------------------------
-  const exp = (monthOffset: number, day: number, category: DataState['expenses'][number]['category'], description: string, amount: number, assetId?: string) => ({
-    id: uid('exp'), date: addDays(monthStart(monthOffset), day - 1), category, description, amount, assetId, createdAt: ts(10),
-  });
+  const exp = (monthOffset: number, day: number, category: DataState['expenses'][number]['category'], description: string, amount: number, assetId?: string) => {
+    const raw = addDays(monthStart(monthOffset), day - 1);
+    return { id: uid('exp'), date: raw > today ? today : raw, category, description, amount, assetId, createdAt: ts(10) }; // never date a cost in the future
+  };
   const expenses = [
     ...[-7, -6, -5, -4, -3, -2, -1, 0].flatMap((m, i) => [
       exp(m, 4, 'fuel', 'Fleet diesel (fictional)', 9800 + (i % 3) * 1200),

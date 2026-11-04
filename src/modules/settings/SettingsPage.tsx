@@ -4,6 +4,7 @@ import RoleBar from '../../components/RoleBar';
 import { Confirm, Field, Notice, PageHeader, Panel } from '../../components/ui';
 import { formatDateTime } from '../../lib/dates';
 import { parseNumber } from '../../lib/money';
+import { useShallow } from 'zustand/react/shallow';
 import { STORAGE_KEY, useStore } from '../../store/useStore';
 
 export default function SettingsPage() {
@@ -12,7 +13,7 @@ export default function SettingsPage() {
   const update = useStore((s) => s.updateSettings);
   const resetDemo = useStore((s) => s.resetDemo);
   const toast = useStore((s) => s.toast);
-  const counts = useStore((s) => ({ quotations: s.quotations.length, invoices: s.invoices.length, payments: s.payments.length, requests: s.requests.length, assets: s.assets.length, expenses: s.expenses.length, hr: s.hrRecords.length, incidents: s.incidents.length }));
+  const counts = useStore(useShallow((s) => ({ quotations: s.quotations.length, invoices: s.invoices.length, payments: s.payments.length, requests: s.requests.length, assets: s.assets.length, expenses: s.expenses.length, hr: s.hrRecords.length, incidents: s.incidents.length })));
   const [vat, setVat] = useState(String(settings.vatRate));
   const [company, setCompany] = useState(settings.companyName);
   const [err, setErr] = useState('');
