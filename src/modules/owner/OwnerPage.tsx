@@ -9,19 +9,6 @@ import { useStore } from '../../store/useStore';
 
 export default function OwnerPage() {
   const store = useStore();
-  const role = store.settings.role;
-  if (role !== 'owner') {
-    return (
-      <>
-        <PageHeader kicker="Private / Owner oversight" title="Owner view" subtitle="Financial and operational summary intended for the owner only." />
-        <RoleBar />
-        <Panel>
-          <div className="empty"><IcoLock style={{ width: 28, height: 28, color: 'var(--gold)' }} /><b style={{ marginTop: 10 }}>Switch to the Owner role to view this page</b>This restriction is simulated in the browser. A public GitHub Pages demo cannot protect confidential data — a production owner view would need real authentication and server-side segregation.</div>
-        </Panel>
-      </>
-    );
-  }
-
   const months = lastMonths(6);
   const series = monthlySeries(store, months);
   const out = outstanding(store.invoices, store.payments);
@@ -35,9 +22,9 @@ export default function OwnerPage() {
 
   return (
     <>
-      <PageHeader kicker="Private / Owner oversight" title="Owner view" subtitle={`Six-month summary (${monthLabel(months[0])} – ${monthLabel(months[months.length - 1])}) of fictional demo records.`} actions={<Tag tone="gold"><IcoLock style={{ width: 12, height: 12 }} />Simulated owner-only</Tag>} />
+      <PageHeader kicker="Private / Owner oversight" title="Owner view" subtitle={`Six-month summary (${monthLabel(months[0])} – ${monthLabel(months[months.length - 1])}) of fictional demo records.`} actions={<Tag tone="gold"><IcoLock style={{ width: 12, height: 12 }} />Granted to this user only</Tag>} />
       <RoleBar />
-      <Notice tone="amber">Sample private-looking values only. GitHub Pages cannot keep this page confidential — hiding it behind a role switch is a demonstration of intent, not security.</Notice>
+      <Notice tone="amber">Sample private-looking values only. Access to this page is granted per user by the Super Admin, but GitHub Pages cannot keep it confidential — the restriction is a demonstration of intent, not security.</Notice>
       <div className="stat-grid" style={{ marginTop: 20 }}>
         <Stat label="Invoiced (6 months)" value={formatRand(totals.invoiced)} sub="Incl. VAT" />
         <Stat label="Received (6 months)" value={formatRand(totals.received)} sub="Fictional receipts" />

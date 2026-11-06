@@ -5,7 +5,7 @@ built by Embark Digitals as a discovery prototype. It is **not** a production sy
 
 - All customers, vehicles, staff codes, invoices, requests and figures are fictional.
 - Records persist only in the current browser (localStorage). Another browser or device starts fresh.
-- The role switcher is a simulation for demonstration; a public static site cannot enforce real permissions.
+- Users, roles and module permissions are a simulation for demonstration; a public static site cannot enforce real access control.
 - No credentials, analytics or third-party services are embedded.
 
 ## Live demo (verified)
@@ -15,9 +15,10 @@ built by Embark Digitals as a discovery prototype. It is **not** a production sy
 - **Deploys:** GitHub Actions on every push to `main` (typecheck → unit tests → build → Pages). Status, run links and
   the checks performed on each release are recorded in `docs/DEPLOYMENT_STATUS.md`.
 
-Open the URL in any modern browser. Use the role switcher (Requester / Manager / Finance / Owner) on the
-Procurement, PPE, People and Owner pages to walk through the approval workflow. Settings → Reset restores the
-fictional starting data.
+Open the URL in any modern browser. Use the **Signed in as** switcher in the top bar to move between fictional
+users (Super Admin, Owner, Supervisor, Finance Clerk, Procurement Officer, HR Officer, Fleet Controller, Requester).
+Each user sees only the modules granted to them; the Super Admin sees everything and grants or revokes module
+access and approval rights under **Users & permissions**. Settings → Reset restores the fictional starting data.
 
 ## Documentation
 
@@ -57,7 +58,7 @@ Source layout: `src/app` (shell, routes, nav) · `src/components` (shared UI) ·
 ## Limitations
 
 - Static frontend only: data lives in the browser's localStorage, per browser/device, with no sync or backup.
-- The role switcher is a simulation. The "owner-only" page is hidden by JavaScript, not protected.
+- Users and permissions are a simulation. Pages are hidden by JavaScript, not protected.
 - PDFs are watermarked demonstration documents, not valid tax invoices. VAT 15% is a configurable demo default.
 - No login, email, payments, integrations or real records. See `docs/BUSINESS_SCOPE_AND_LIMITATIONS.md`.
 

@@ -1,21 +1,23 @@
-import { useStore } from '../store/useStore';
-import { ROLE_LABELS, type Role } from '../store/types';
+import { useStore, selectCurrentUser } from '../store/useStore';
+import { ROLE_LABELS } from '../store/types';
 
-const ROLES: Role[] = ['requester', 'manager', 'finance', 'owner'];
-
-/** Simulated role switcher. This is a frontend simulation only — not real authentication. */
+/**
+ * "Signed in as" bar. Switches the simulated demo user. This is a frontend
+ * simulation only — a public static demo has no real authentication.
+ */
 export default function RoleBar({ note }: { note?: string }) {
-  const role = useStore((s) => s.settings.role);
-  const setRole = useStore((s) => s.setRole);
+  const users = useStore((s) => s.users);
+  const settings = useStore((s) => s.settings);
+  const signInAs = useStore((s) => s.signInAs);
+  const user = selectCurrentUser({ users, settings });
   return (
     <div className="role-bar" data-testid="role-bar">
-      <span className="label">Viewing as</span>
-      <div className="segmented" role="group" aria-label="Simulated role">
-        {ROLES.map((r) => (
-          <button key={r} type="button" aria-pressed={role === r} onClick={() => setRole(r)} data-testid={`role-${r}`}>{ROLE_LABELS[r]}</button>
-        ))}
-      </div>
-      <span className="warn">{note ?? 'Role access is simulated in the browser for demonstration only. A public static demo cannot enforce real permissions.'}</span>
+      <span className="label">Signed in as</span>
+      <select className="select sm" style={{ width: 'auto', minWidth: 230 }} value={user.id} onChange={(e) => signInAs(e.target.value)} aria-label="Switch simulated user" data-testid="user-switcher-inline">
+        {users.map((u) => <option key={u.id} value={u.id}>{u.name} · {u.title}</option>)}
+      </select>
+      <span className="tag gold">{ROLE_LABELS[user.role]}{user.canApprove ? ' · approver' : ''}{user.isSuperAdmin ? ' · all access' : ''}</span>
+      <span className="warn">{note ?? 'Users and permissions are simulated in the browser for demonstration only. A public static demo cannot enforce real access control.'}</span>
     </div>
   );
 }

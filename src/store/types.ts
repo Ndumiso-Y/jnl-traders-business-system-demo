@@ -4,13 +4,42 @@
 // computed on demand with integer-cent arithmetic (see lib/money.ts).
 // ---------------------------------------------------------------------------
 
-export type Role = 'requester' | 'manager' | 'finance' | 'owner';
+export type Role = 'requester' | 'manager' | 'finance' | 'owner' | 'admin';
 
 export const ROLE_LABELS: Record<Role, string> = {
   requester: 'Requester',
   manager: 'Manager',
   finance: 'Finance',
   owner: 'Owner',
+  admin: 'Super admin',
+};
+
+/** Modules a demo user can be granted. 'admin' is the Users & permissions screen. */
+export type ModuleKey = 'overview' | 'finance' | 'procurement' | 'ppe' | 'fleet' | 'reports' | 'hr' | 'safety' | 'owner' | 'admin';
+
+export const MODULES: Array<{ key: ModuleKey; label: string; path: string; short: string }> = [
+  { key: 'overview', label: 'Overview', path: '/', short: 'Overview' },
+  { key: 'finance', label: 'Finance', path: '/finance', short: 'Finance' },
+  { key: 'procurement', label: 'Procurement', path: '/procurement', short: 'Procure.' },
+  { key: 'ppe', label: 'PPE requests', path: '/ppe', short: 'PPE' },
+  { key: 'fleet', label: 'Fleet & equipment', path: '/fleet', short: 'Fleet' },
+  { key: 'reports', label: 'Reports', path: '/reports', short: 'Reports' },
+  { key: 'hr', label: 'HR records', path: '/people', short: 'HR' },
+  { key: 'safety', label: 'Safety register', path: '/people', short: 'Safety' },
+  { key: 'owner', label: 'Owner view', path: '/owner', short: 'Owner' },
+  { key: 'admin', label: 'Users & permissions', path: '/admin', short: 'Admin' },
+];
+
+/** A fictional demo user. Access is simulated in the browser only. */
+export type DemoUser = {
+  id: string;
+  name: string;
+  title: string;
+  role: Role;
+  modules: ModuleKey[];
+  canApprove: boolean; // approve / reject requests
+  canReviewFinance: boolean; // raise purchase orders, mark fulfilled
+  isSuperAdmin: boolean; // sees everything and manages permissions
 };
 
 export type Customer = {
@@ -98,6 +127,7 @@ export type Request = {
   department: string;
   requesterName: string;
   requesterRole: Role;
+  requesterUserId?: string;
   neededBy: string;
   justification: string;
   items: RequestItem[];
@@ -207,6 +237,7 @@ export type Settings = {
   role: Role;
   companyName: string;
   showDemoBanner: boolean;
+  currentUserId: string;
 };
 
 export type Counters = {
@@ -224,6 +255,7 @@ export type DataState = {
   seededAt: string;
   settings: Settings;
   counters: Counters;
+  users: DemoUser[];
   customers: Customer[];
   quotations: Quotation[];
   invoices: Invoice[];

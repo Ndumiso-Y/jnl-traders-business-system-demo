@@ -1,3 +1,37 @@
+# QA results
+
+## Update — 06 November 2026: users & permissions release
+
+```
+> vitest run
+ ✓ tests/money.test.ts (14 tests)
+ ✓ tests/requests.test.ts (5 tests)
+ ✓ tests/access.test.ts (8 tests)      (new: module access, super admin, derived approval rights, migration fallback)
+ ✓ tests/pdf.test.ts (2 tests)
+      Tests  29 passed (29)
+
+> eslint src                  (no errors, no warnings)
+> tsc -b                      (no errors)
+> vite build                  main chunk 489.20 kB (gzip 146.47 kB); pdf chunk lazy 424.33 kB
+> playwright test             21 passed (57.8s), 1 skipped (live spec without LIVE_URL)
+```
+
+| Requirement (meeting) | Result | Evidence |
+| --- | --- | --- |
+| Super admin sees everything | **PASS** | `permissions.spec.ts`: as Demo Super Admin every module appears in navigation; unit test: super admin has every module without explicit grants |
+| Finance sees only finance, HR only HR, fleet only fleet | **PASS** | `permissions.spec.ts` "module-scoped visibility": Finance Clerk nav lacks Fleet/People/Owner and `#/fleet` shows No access; HR Officer lacks Finance and `#/finance` shows No access; Fleet Controller lacks Finance and Reports |
+| Super admin grants permission to see different things | **PASS** | Super Admin grants Fleet to and revokes Finance from the Finance Clerk; navigation and direct links change immediately and survive reload |
+| Approval right managed by super admin | **PASS** | Granting Approve to the Requester enables the Approve button on another user's request; revoking disables it |
+| Non-admins cannot edit permissions | **PASS** | Owner gets No access to `#/admin` until granted; when granted the matrix is read-only with checkboxes disabled |
+| Add / remove demo users with validation | **PASS** | Empty name blocked; added user appears; cannot remove yourself (button disabled); removal confirmed in a dialog |
+| Existing browser data keeps working | **PASS** | v1 saved state without users is migrated to v2 with seed users and the previous role mapped to a user |
+
+First run of the new suite had 3 failures (keyboard-test focus start point, Finance Clerk lacked the PPE module so the finance-review step hit No access, migration test ran before anything was persisted). All three were fixed; final run 21 passed.
+
+Screenshots added: `qa/screenshots/*-admin.png` at 1440 / 1024 / 768 / 390 px.
+
+---
+
 # QA results — 04 November 2026
 
 Evidence rule: a row is **PASS** only where the command output or browser capture below shows it. Anything

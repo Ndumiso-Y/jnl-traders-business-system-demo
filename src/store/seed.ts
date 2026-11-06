@@ -3,7 +3,7 @@
 // JNL Traders customers, staff, vehicles, suppliers or finances.
 // Dates are generated relative to "today" so due/overdue states are visible.
 // ---------------------------------------------------------------------------
-import type { DataState, Role } from './types';
+import type { DataState, DemoUser, Role } from './types';
 import { addDays, todayIso, toIso } from '../lib/dates';
 
 const uid = (() => {
@@ -23,6 +23,22 @@ function monthStart(offset: number): string {
   d.setDate(1);
   d.setMonth(d.getMonth() + offset);
   return toIso(d);
+}
+
+const ALL: DemoUser['modules'] = ['overview', 'finance', 'procurement', 'ppe', 'fleet', 'reports', 'hr', 'safety', 'owner', 'admin'];
+
+/** Fictional demo users with module-scoped access (simulated). */
+export function seedUsers(): DemoUser[] {
+  return [
+    { id: 'u_admin', name: 'Demo Super Admin', title: 'System administrator', role: 'admin', modules: [...ALL], canApprove: true, canReviewFinance: true, isSuperAdmin: true },
+    { id: 'u_owner', name: 'Demo Owner', title: 'Owner / director', role: 'owner', modules: ALL.filter((m) => m !== 'admin'), canApprove: true, canReviewFinance: true, isSuperAdmin: false },
+    { id: 'u_supervisor', name: 'Demo Supervisor', title: 'Operations manager', role: 'manager', modules: ['overview', 'procurement', 'ppe', 'fleet', 'reports', 'safety'], canApprove: true, canReviewFinance: false, isSuperAdmin: false },
+    { id: 'u_finance', name: 'Demo Finance Clerk', title: 'Finance', role: 'finance', modules: ['overview', 'finance', 'procurement', 'ppe', 'reports'], canApprove: false, canReviewFinance: true, isSuperAdmin: false },
+    { id: 'u_procurement', name: 'Demo Procurement Officer', title: 'Procurement', role: 'finance', modules: ['overview', 'procurement', 'ppe'], canApprove: false, canReviewFinance: true, isSuperAdmin: false },
+    { id: 'u_hr', name: 'Demo HR Officer', title: 'Human resources', role: 'manager', modules: ['overview', 'hr', 'safety'], canApprove: false, canReviewFinance: false, isSuperAdmin: false },
+    { id: 'u_fleet', name: 'Demo Fleet Controller', title: 'Fleet & equipment', role: 'requester', modules: ['overview', 'fleet', 'procurement', 'safety'], canApprove: false, canReviewFinance: false, isSuperAdmin: false },
+    { id: 'u_requester', name: 'Demo Requester', title: 'Workshop employee', role: 'requester', modules: ['overview', 'procurement', 'ppe', 'safety'], canApprove: false, canReviewFinance: false, isSuperAdmin: false },
+  ];
 }
 
 export function buildSeed(): DataState {
@@ -111,56 +127,56 @@ export function buildSeed(): DataState {
 
   const requests = [
     {
-      id: 'req_031', number: 'REQ-D031', kind: 'procurement' as const, title: 'Workshop consumables restock', department: 'Workshop', requesterName: 'Demo Requester', requesterRole: 'requester' as const,
+      id: 'req_031', number: 'REQ-D031', kind: 'procurement' as const, title: 'Workshop consumables restock', department: 'Workshop', requesterName: 'Demo Requester', requesterRole: 'requester' as const, requesterUserId: 'u_requester',
       neededBy: addDays(today, -20), justification: 'Monthly consumables for fictional workshop operations.', items: [ri('Cutting discs (box)', 4, 420), ri('Welding rods (5kg)', 6, 310)],
       status: 'fulfilled' as const, purchaseOrderId: 'po_011',
       history: [h(40, 'requester', 'Demo Requester', 'Created draft'), h(39, 'requester', 'Demo Requester', 'Submitted for approval'), h(37, 'manager', 'Demo Manager', 'Approved', 'Within monthly consumables budget.'), h(36, 'finance', 'Demo Finance', 'Purchase order raised', 'PO-D011'), h(28, 'finance', 'Demo Finance', 'Marked fulfilled', 'Goods received.')],
       createdAt: ts(40), updatedAt: ts(28),
     },
     {
-      id: 'req_032', number: 'REQ-D032', kind: 'ppe' as const, title: 'Safety boots — site crew', department: 'Operations', requesterName: 'Demo Supervisor', requesterRole: 'requester' as const,
+      id: 'req_032', number: 'REQ-D032', kind: 'ppe' as const, title: 'Safety boots — site crew', department: 'Operations', requesterName: 'Demo Supervisor', requesterRole: 'manager' as const, requesterUserId: 'u_supervisor',
       neededBy: addDays(today, -10), justification: 'Replacement boots for fictional crew of six.', items: [ri('Safety boots (pair)', 6, 650)],
       status: 'fulfilled' as const, purchaseOrderId: 'po_012',
       history: [h(30, 'requester', 'Demo Supervisor', 'Submitted for approval'), h(29, 'manager', 'Demo Manager', 'Approved'), h(27, 'finance', 'Demo Finance', 'Purchase order raised', 'PO-D012'), h(18, 'finance', 'Demo Finance', 'Marked fulfilled')],
       createdAt: ts(30), updatedAt: ts(18),
     },
     {
-      id: 'req_033', number: 'REQ-D033', kind: 'procurement' as const, title: 'Replacement tyres — FLT-002', department: 'Fleet', requesterName: 'Demo Fleet Clerk', requesterRole: 'requester' as const,
+      id: 'req_033', number: 'REQ-D033', kind: 'procurement' as const, title: 'Replacement tyres — FLT-002', department: 'Fleet', requesterName: 'Demo Fleet Controller', requesterRole: 'requester' as const, requesterUserId: 'u_fleet',
       neededBy: addDays(today, 7), justification: 'Tyres on fictional service vehicle below legal tread depth.', items: [ri('Tyre 265/65 R17', 4, 1850)],
       status: 'approved' as const,
       history: [h(9, 'requester', 'Demo Fleet Clerk', 'Submitted for approval'), h(7, 'manager', 'Demo Manager', 'Approved', 'Safety-critical. Proceed.')],
       createdAt: ts(9), updatedAt: ts(7),
     },
     {
-      id: 'req_034', number: 'REQ-D034', kind: 'ppe' as const, title: 'Hi-vis vests and hard hats', department: 'Operations', requesterName: 'Demo Supervisor', requesterRole: 'requester' as const,
+      id: 'req_034', number: 'REQ-D034', kind: 'ppe' as const, title: 'Hi-vis vests and hard hats', department: 'Operations', requesterName: 'Demo Supervisor', requesterRole: 'manager' as const, requesterUserId: 'u_supervisor',
       neededBy: addDays(today, 14), justification: 'New fictional site induction batch.', items: [ri('Hi-vis vest', 12, 95), ri('Hard hat', 12, 140)],
       status: 'submitted' as const,
       history: [h(3, 'requester', 'Demo Supervisor', 'Created draft'), h(2, 'requester', 'Demo Supervisor', 'Submitted for approval')],
       createdAt: ts(3), updatedAt: ts(2),
     },
     {
-      id: 'req_035', number: 'REQ-D035', kind: 'procurement' as const, title: 'Office printer toner', department: 'Admin', requesterName: 'Demo Admin', requesterRole: 'requester' as const,
+      id: 'req_035', number: 'REQ-D035', kind: 'procurement' as const, title: 'Office printer toner', department: 'Admin', requesterName: 'Demo Requester', requesterRole: 'requester' as const, requesterUserId: 'u_requester',
       neededBy: addDays(today, 10), justification: 'Fictional admin supplies.', items: [ri('Toner cartridge (black)', 2, 1150)],
       status: 'submitted' as const,
       history: [h(1, 'requester', 'Demo Admin', 'Submitted for approval')],
       createdAt: ts(1), updatedAt: ts(1),
     },
     {
-      id: 'req_036', number: 'REQ-D036', kind: 'procurement' as const, title: 'Second-hand compressor', department: 'Workshop', requesterName: 'Demo Requester', requesterRole: 'requester' as const,
+      id: 'req_036', number: 'REQ-D036', kind: 'procurement' as const, title: 'Second-hand compressor', department: 'Workshop', requesterName: 'Demo Requester', requesterRole: 'requester' as const, requesterUserId: 'u_requester',
       neededBy: addDays(today, 21), justification: 'Requested fictional backup compressor.', items: [ri('Compressor 200L (used)', 1, 14500)],
       status: 'rejected' as const,
       history: [h(6, 'requester', 'Demo Requester', 'Submitted for approval'), h(4, 'owner', 'Demo Owner', 'Rejected', 'Not budgeted this quarter. Re-submit in the new period.')],
       createdAt: ts(6), updatedAt: ts(4),
     },
     {
-      id: 'req_037', number: 'REQ-D037', kind: 'ppe' as const, title: 'Respirator cartridges', department: 'Workshop', requesterName: 'Demo Requester', requesterRole: 'requester' as const,
+      id: 'req_037', number: 'REQ-D037', kind: 'ppe' as const, title: 'Respirator cartridges', department: 'Workshop', requesterName: 'Demo Requester', requesterRole: 'requester' as const, requesterUserId: 'u_requester',
       neededBy: addDays(today, 5), justification: 'Replacement cartridges for fictional spray booth work.', items: [ri('Respirator cartridge (pair)', 10, 180)],
       status: 'submitted' as const,
       history: [h(1, 'requester', 'Demo Requester', 'Submitted for approval')],
       createdAt: ts(1, 15, 10), updatedAt: ts(1, 15, 10),
     },
     {
-      id: 'req_038', number: 'REQ-D038', kind: 'procurement' as const, title: 'Laptop for site office', department: 'Admin', requesterName: 'Demo Admin', requesterRole: 'requester' as const,
+      id: 'req_038', number: 'REQ-D038', kind: 'procurement' as const, title: 'Laptop for site office', department: 'Admin', requesterName: 'Demo Requester', requesterRole: 'requester' as const, requesterUserId: 'u_requester',
       neededBy: addDays(today, 30), justification: 'Draft — fictional request not yet submitted.', items: [ri('Laptop (mid-range)', 1, 12500)],
       status: 'draft' as const,
       history: [h(0, 'requester', 'Demo Admin', 'Created draft')],
@@ -240,7 +256,8 @@ export function buildSeed(): DataState {
   return {
     version: 1,
     seededAt: new Date().toISOString(),
-    settings: { vatRate: 15, role: 'manager', companyName: 'JNL Traders', showDemoBanner: true },
+    settings: { vatRate: 15, role: 'manager', companyName: 'JNL Traders', showDemoBanner: true, currentUserId: 'u_supervisor' },
+    users: seedUsers(),
     counters: { quotation: 104, invoice: 210, request: 39, po: 14, asset: 11, hr: 6, incident: 4 },
     customers,
     quotations,

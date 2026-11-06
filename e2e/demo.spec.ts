@@ -13,6 +13,11 @@ function trackErrors(page: Page): string[] {
   return errors;
 }
 
+/** Switch the simulated user through the top-bar switcher. */
+async function signInAs(page: Page, userId: string) {
+  await page.getByTestId('user-switcher').selectOption(userId);
+}
+
 async function fresh(page: Page) {
   await page.goto('#/');
   await page.evaluate(() => localStorage.clear());
@@ -24,7 +29,8 @@ test.describe('Shell and navigation', () => {
   test('all modules load with no console errors; hard refresh keeps route', async ({ page }) => {
     const errors = trackErrors(page);
     await fresh(page);
-    for (const [label, heading] of [['Finance', 'Quotations & invoices'], ['Procurement', 'Procurement requests'], ['PPE Requests', 'PPE requests'], ['Fleet & Equipment', 'Fleet & equipment'], ['Reports', 'Monthly reports'], ['People & Safety', 'People & safety'], ['Owner view', 'Owner view'], ['Settings & demo reset', 'Settings & demo reset']]) {
+    await signInAs(page, 'u_admin');
+    for (const [label, heading] of [['Finance', 'Quotations & invoices'], ['Procurement', 'Procurement requests'], ['PPE Requests', 'PPE requests'], ['Fleet & Equipment', 'Fleet & equipment'], ['Reports', 'Monthly reports'], ['People & Safety', 'People & safety'], ['Owner view', 'Owner view'], ['Users & permissions', 'Users & permissions'], ['Settings & demo reset', 'Settings & demo reset']]) {
       await page.getByRole('link', { name: label, exact: true }).click();
       await expect(page.getByRole('heading', { name: heading, level: 1 })).toBeVisible();
     }
@@ -36,6 +42,8 @@ test.describe('Shell and navigation', () => {
 
   test('keyboard: Tab reaches navigation and Enter activates', async ({ page }) => {
     await fresh(page);
+    await signInAs(page, 'u_owner');
+    await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
     await page.keyboard.press('Tab'); // skip link
     await page.keyboard.press('Tab'); // brand
     await page.keyboard.press('Tab'); // Overview
@@ -57,6 +65,7 @@ test.describe('Finance', () => {
   test('2 x R100 excl VAT = R230.00; VAT inclusive, discount, validation, convert, payment, statement, PDF', async ({ page }) => {
     const errors = trackErrors(page);
     await fresh(page);
+    await signInAs(page, 'u_finance');
     await page.getByTestId('new-quotation').click();
     await expect(page.getByRole('heading', { name: /Quotation Q-D/ })).toBeVisible();
     await page.getByLabel('Line 1 description').fill('Demo item');
@@ -136,6 +145,7 @@ test.describe('Finance', () => {
 
   test('delete asks for confirmation', async ({ page }) => {
     await fresh(page);
+    await signInAs(page, 'u_finance');
     await page.goto('#/finance/quotations');
     const before = await page.getByTestId('quotation-row').count();
     await page.getByTestId('quotation-row').first().click();
@@ -154,7 +164,7 @@ test.describe('Procurement / PPE workflow', () => {
     const pendingBefore = Number(await page.locator('.stat', { hasText: 'Pending approvals' }).locator('.metric-main').textContent());
 
     await page.goto('#/ppe');
-    await page.getByTestId('role-requester').click();
+    await signInAs(page, 'u_requester');
     await page.getByTestId('new-request').click();
     await page.getByTestId('request-title').fill('Gloves for workshop');
     await page.getByTestId('request-department').fill('Workshop');
@@ -164,9 +174,9 @@ test.describe('Procurement / PPE workflow', () => {
     await expect(page.locator('.doc-head .tag')).toHaveText('Awaiting review');
     await expect(page.getByTestId('approve-request')).toBeDisabled();
     await expect(page.getByTestId('reject-request')).toBeDisabled();
-    await expect(page.getByText(/Requesters cannot approve or reject/).first()).toBeVisible();
+    await expect(page.getByText(/does not have approval rights/).first()).toBeVisible();
 
-    await page.getByTestId('role-manager').click();
+    await signInAs(page, 'u_supervisor');
     await expect(page.getByTestId('approve-request')).toBeEnabled();
     await page.getByTestId('approve-request').click();
     await page.getByTestId('decision-note').fill('Approved for demo.');
@@ -174,7 +184,7 @@ test.describe('Procurement / PPE workflow', () => {
     await expect(page.locator('.doc-head .tag')).toHaveText('Approved');
     await expect(page.getByTestId('history')).toContainText('Approved for demo.');
 
-    await page.getByTestId('role-finance').click();
+    await signInAs(page, 'u_finance');
     await expect(page.getByText(/Finance review: this request is approved/)).toBeVisible();
     await page.getByTestId('raise-po').click();
     await page.getByTestId('po-supplier').fill('Demo Safety Wear CC');
@@ -192,7 +202,7 @@ test.describe('Procurement / PPE workflow', () => {
   test('manager cannot approve own request; owner can', async ({ page }) => {
     await fresh(page);
     await page.goto('#/procurement');
-    await page.getByTestId('role-manager').click();
+    await signInAs(page, 'u_supervisor');
     await page.getByTestId('new-request').click();
     await page.getByTestId('request-title').fill('Manager self-request');
     await page.getByTestId('request-department').fill('Ops');
@@ -200,7 +210,7 @@ test.describe('Procurement / PPE workflow', () => {
     await page.getByTestId('item-description').fill('Item');
     await page.getByTestId('submit-request').click();
     await expect(page.getByTestId('approve-request')).toBeDisabled();
-    await page.getByTestId('role-owner').click();
+    await signInAs(page, 'u_owner');
     await expect(page.getByTestId('approve-request')).toBeEnabled();
   });
 });
@@ -237,6 +247,7 @@ test.describe('Fleet, reports, persistence and reset', () => {
 
   test('records survive reload; reset warns and restores seed', async ({ page }) => {
     await fresh(page);
+    await signInAs(page, 'u_finance');
     await page.goto('#/finance/customers');
     await page.getByTestId('new-customer').click();
     await page.getByTestId('customer-save').click();
@@ -256,19 +267,20 @@ test.describe('Fleet, reports, persistence and reset', () => {
   test('owner view is hidden for other roles (simulated)', async ({ page }) => {
     await fresh(page);
     await page.goto('#/owner');
-    await page.getByTestId('role-requester').click();
-    await expect(page.getByText('Switch to the Owner role to view this page')).toBeVisible();
-    await page.getByTestId('role-owner').click();
+    await signInAs(page, 'u_requester');
+    await expect(page.getByTestId('no-access')).toBeVisible();
+    await signInAs(page, 'u_owner');
     await expect(page.getByText('Outstanding receivables')).toBeVisible();
   });
 });
 
 test.describe('Responsive viewports', () => {
-  const pages: Array<[string, string]> = [['overview', '#/'], ['finance-quotation', '#/finance/quotations/quo_101'], ['fleet', '#/fleet'], ['procurement', '#/procurement'], ['reports', '#/reports']];
+  const pages: Array<[string, string]> = [['overview', '#/'], ['finance-quotation', '#/finance/quotations/quo_101'], ['fleet', '#/fleet'], ['procurement', '#/procurement'], ['reports', '#/reports'], ['admin', '#/admin']];
   for (const [w, h, name] of [[1440, 900, 'desktop-1440'], [1024, 768, 'desktop-1024'], [768, 1024, 'tablet-768'], [390, 844, 'mobile-390']] as Array<[number, number, string]>) {
     test(`${name}: no horizontal overflow, screenshots captured`, async ({ page }) => {
       await page.setViewportSize({ width: w, height: h });
       await fresh(page);
+      await signInAs(page, 'u_admin');
       for (const [label, route] of pages) {
         await page.goto(route);
         await page.waitForTimeout(400);

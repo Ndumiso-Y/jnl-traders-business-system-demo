@@ -91,8 +91,8 @@ BT
 10.9249999999999989 TL
 0.129 0.145 0.129 rg
 340.157480314960651 708.6616535433070112 Td
-(Invoice date: 04 Nov 2026) Tj
-T* (Due date: 04 Dec 2026) Tj
+(Invoice date: 06 Nov 2026) Tj
+T* (Due date: 06 Dec 2026) Tj
 T* (Status: issued) Tj
 T* (Pricing: VAT exclusive · rate 15% \(sample\)) Tj
 T* (Converted from quotation) Tj
@@ -554,7 +554,7 @@ endobj
 20 0 obj
 <<
 /Producer (jsPDF 3.0.4)
-/CreationDate (D:20261104234746+02'00')
+/CreationDate (D:20261106084014+02'00')
 >>
 endobj
 21 0 obj
@@ -594,7 +594,7 @@ trailer
 /Size 22
 /Root 21 0 R
 /Info 20 0 R
-/ID [ <504A45556C69EEFAEE73B02A0B8C7C5B> <504A45556C69EEFAEE73B02A0B8C7C5B> ]
+/ID [ <847DE103A05C5DE6D2779890565025BA> <847DE103A05C5DE6D2779890565025BA> ]
 >>
 startxref
 9710

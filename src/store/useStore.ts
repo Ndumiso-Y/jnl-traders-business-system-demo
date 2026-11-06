@@ -1,14 +1,15 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type {
-  Activity, Asset, Customer, DataState, Expense, HrRecord, HistoryEntry, Invoice, LineItem,
+  Activity, Asset, Customer, DataState, DemoUser, Expense, HrRecord, HistoryEntry, Invoice, LineItem, ModuleKey,
   Payment, PurchaseOrder, Quotation, Request, RequestItem, RequestStatus, Role, SafetyIncident, Settings,
 } from './types';
 import { ROLE_LABELS } from './types';
-import { buildSeed } from './seed';
+import { buildSeed, seedUsers } from './seed';
 import { addDays, todayIso } from '../lib/dates';
 
 export const STORAGE_KEY = 'jnl-bms-demo-v1';
+export const STORE_VERSION = 2;
 
 let seq = Date.now() % 100000;
 export function newId(prefix: string): string {
@@ -20,8 +21,14 @@ const now = () => new Date().toISOString();
 type Toast = { id: string; text: string; tone: 'ok' | 'err' | 'info' };
 
 export type Actions = {
+  // users & simulated access
+  signInAs: (userId: string) => void;
+  setRole: (role: Role) => void; // signs in as the first user holding that role
+  updateUser: (id: string, patch: Partial<DemoUser>) => void;
+  addUser: (u: Omit<DemoUser, 'id'>) => DemoUser;
+  deleteUser: (id: string) => { ok: boolean; reason?: string };
+  resetUsers: () => void;
   // settings
-  setRole: (role: Role) => void;
   updateSettings: (patch: Partial<Settings>) => void;
   resetDemo: () => void;
   // toasts
@@ -76,8 +83,25 @@ const emptyReqItem = (): RequestItem => ({ id: newId('ri'), description: '', qty
 
 const pad = (n: number, w = 4) => n.toString().padStart(w, '0');
 
-/** Who may move a request from -> to. Requester may never approve/reject. */
-export function canTransition(role: Role, from: RequestStatus, to: RequestStatus, isOwnRequest: boolean): { ok: boolean; reason?: string } {
+/** What an actor may do in the request workflow (derived from a role or a demo user). */
+export type Actor = { label: string; canApprove: boolean; canFulfil: boolean; overrideOwn: boolean };
+
+export function actorForRole(role: Role): Actor {
+  switch (role) {
+    case 'requester': return { label: ROLE_LABELS[role], canApprove: false, canFulfil: false, overrideOwn: false };
+    case 'manager': return { label: ROLE_LABELS[role], canApprove: true, canFulfil: true, overrideOwn: false };
+    case 'finance': return { label: ROLE_LABELS[role], canApprove: false, canFulfil: true, overrideOwn: false };
+    case 'owner': case 'admin': return { label: ROLE_LABELS[role], canApprove: true, canFulfil: true, overrideOwn: true };
+  }
+}
+
+export function actorForUser(u: DemoUser): Actor {
+  return { label: u.name, canApprove: u.canApprove, canFulfil: u.canApprove || u.canReviewFinance, overrideOwn: u.role === 'owner' || u.isSuperAdmin };
+}
+
+/** Who may move a request from -> to. Approval needs the approve permission; nobody but an owner/super admin may approve their own request. */
+export function canTransition(who: Role | Actor, from: RequestStatus, to: RequestStatus, isOwnRequest: boolean): { ok: boolean; reason?: string } {
+  const actor = typeof who === 'string' ? actorForRole(who) : who;
   const table: Record<RequestStatus, RequestStatus[]> = {
     draft: ['submitted'],
     submitted: ['approved', 'rejected', 'draft'],
@@ -87,11 +111,10 @@ export function canTransition(role: Role, from: RequestStatus, to: RequestStatus
   };
   if (!table[from].includes(to)) return { ok: false, reason: `Cannot move a ${from} request to ${to}.` };
   if (to === 'approved' || to === 'rejected') {
-    if (role === 'requester') return { ok: false, reason: 'Requesters cannot approve or reject requests (simulated role rule).' };
-    if (role === 'finance' && from === 'submitted') return { ok: false, reason: 'Finance reviews approved requests; approval sits with a Manager or the Owner (simulated role rule).' };
-    if (isOwnRequest && role !== 'owner') return { ok: false, reason: 'You cannot approve or reject your own request (simulated separation of duties).' };
+    if (!actor.canApprove) return { ok: false, reason: `${actor.label} does not have approval rights (simulated permission).` };
+    if (isOwnRequest && !actor.overrideOwn) return { ok: false, reason: 'You cannot approve or reject your own request (simulated separation of duties).' };
   }
-  if (to === 'fulfilled' && role === 'requester') return { ok: false, reason: 'Only Finance, a Manager or the Owner can mark a request fulfilled.' };
+  if (to === 'fulfilled' && !actor.canFulfil) return { ok: false, reason: `${actor.label} cannot mark requests fulfilled; this needs finance review or approval rights (simulated permission).` };
   return { ok: true };
 }
 
@@ -108,9 +131,40 @@ export const useStore = create<Store>()(
       },
       dismissToast: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
 
+      signInAs: (userId) => {
+        const u = get().users.find((x) => x.id === userId);
+        if (!u) return;
+        set((s) => ({ settings: { ...s.settings, currentUserId: u.id, role: u.role } }));
+        get().toast(`Signed in as ${u.name} (simulated — not real authentication)`, 'info');
+      },
       setRole: (role) => {
-        set((s) => ({ settings: { ...s.settings, role } }));
-        get().toast(`Viewing as ${ROLE_LABELS[role]} (simulated role — not real access control)`, 'info');
+        const u = get().users.find((x) => x.role === role);
+        if (u) get().signInAs(u.id); else set((s) => ({ settings: { ...s.settings, role } }));
+      },
+      updateUser: (id, patch) => {
+        set((s) => ({ users: s.users.map((u) => (u.id === id ? { ...u, ...patch } : u)) }));
+        const u = get().users.find((x) => x.id === id);
+        if (u) get().logActivity({ area: 'System', title: 'Permissions updated', detail: `${u.name} · ${u.modules.length} module${u.modules.length === 1 ? '' : 's'}${u.canApprove ? ' · approver' : ''}`, status: 'Updated', tone: 'gold' });
+      },
+      addUser: (u) => {
+        const user: DemoUser = { ...u, id: newId('u') };
+        set((s) => ({ users: [...s.users, user] }));
+        get().logActivity({ area: 'System', title: 'Demo user added', detail: `${user.name} · ${user.title}`, status: 'Added', tone: 'green' });
+        return user;
+      },
+      deleteUser: (id) => {
+        const s = get();
+        const u = s.users.find((x) => x.id === id);
+        if (!u) return { ok: false, reason: 'User not found.' };
+        if (id === s.settings.currentUserId) return { ok: false, reason: 'You cannot remove the user you are signed in as.' };
+        if (u.isSuperAdmin && s.users.filter((x) => x.isSuperAdmin).length === 1) return { ok: false, reason: 'At least one super admin must remain.' };
+        set({ users: s.users.filter((x) => x.id !== id) });
+        get().logActivity({ area: 'System', title: 'Demo user removed', detail: u.name, status: 'Removed', tone: 'red' });
+        return { ok: true };
+      },
+      resetUsers: () => {
+        set((s) => ({ users: seedUsers(), settings: { ...s.settings, currentUserId: 'u_supervisor', role: 'manager' } }));
+        get().toast('Demo users and permissions restored.', 'info');
       },
       updateSettings: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
       resetDemo: () => {
@@ -209,10 +263,11 @@ export const useStore = create<Store>()(
         const s = get();
         const n = s.counters.request;
         const role = s.settings.role;
+        const user = s.users.find((u) => u.id === s.settings.currentUserId);
         const r: Request = {
-          id: newId('req'), number: `REQ-D${pad(n, 3)}`, kind, title: '', department: '', requesterName: `Demo ${ROLE_LABELS[role]}`, requesterRole: role,
+          id: newId('req'), number: `REQ-D${pad(n, 3)}`, kind, title: '', department: '', requesterName: user?.name ?? `Demo ${ROLE_LABELS[role]}`, requesterRole: role, requesterUserId: user?.id,
           neededBy: addDays(todayIso(), 14), justification: '', items: [emptyReqItem()], status: 'draft',
-          history: [{ id: newId('h'), at: now(), byRole: role, byName: `Demo ${ROLE_LABELS[role]}`, action: 'Created draft' }],
+          history: [{ id: newId('h'), at: now(), byRole: role, byName: user?.name ?? `Demo ${ROLE_LABELS[role]}`, action: 'Created draft' }],
           createdAt: now(), updatedAt: now(),
         };
         set({ requests: [r, ...s.requests], counters: { ...s.counters, request: n + 1 } });
@@ -225,15 +280,16 @@ export const useStore = create<Store>()(
         const r = s.requests.find((x) => x.id === id);
         if (!r) return { ok: false, reason: 'Request not found.' };
         const role = s.settings.role;
-        const isOwn = r.requesterRole === role;
-        const check = canTransition(role, r.status, to, isOwn);
+        const user = s.users.find((u) => u.id === s.settings.currentUserId);
+        const isOwn = user && r.requesterUserId ? r.requesterUserId === user.id : r.requesterRole === role;
+        const check = canTransition(user ? actorForUser(user) : role, r.status, to, isOwn);
         if (!check.ok) return check;
         if (to === 'submitted') {
           if (!r.title.trim()) return { ok: false, reason: 'Add a title before submitting.' };
           if (!r.items.length || r.items.some((it) => !it.description.trim() || it.qty <= 0)) return { ok: false, reason: 'Each item needs a description and a quantity above zero.' };
         }
         const labels: Record<RequestStatus, string> = { draft: 'Returned to draft', submitted: 'Submitted for approval', approved: 'Approved', rejected: 'Rejected', fulfilled: 'Marked fulfilled' };
-        const entry: HistoryEntry = { id: newId('h'), at: now(), byRole: role, byName: `Demo ${ROLE_LABELS[role]}`, action: labels[to], note: note?.trim() || undefined };
+        const entry: HistoryEntry = { id: newId('h'), at: now(), byRole: role, byName: user?.name ?? `Demo ${ROLE_LABELS[role]}`, action: labels[to], note: note?.trim() || undefined };
         set((st) => ({ requests: st.requests.map((x) => (x.id === id ? { ...x, status: to, history: [...x.history, entry], updatedAt: now() } : x)) }));
         const tone = to === 'approved' || to === 'fulfilled' ? 'green' : to === 'rejected' ? 'red' : 'amber';
         get().logActivity({ area: r.kind === 'ppe' ? 'PPE' : 'Procurement', title: `${r.kind === 'ppe' ? 'PPE' : 'Procurement'} request ${labels[to].toLowerCase()}`, detail: `${r.number} · ${r.title}`, status: labels[to], tone });
@@ -245,7 +301,8 @@ export const useStore = create<Store>()(
         if (!r || r.status !== 'approved') return null;
         const n = s.counters.po;
         const po: PurchaseOrder = { id: newId('po'), number: `PO-D${pad(n, 3)}`, requestId, supplier, date: todayIso(), expected, items: r.items.map((i) => ({ ...i })), status: 'open', createdAt: now() };
-        const entry: HistoryEntry = { id: newId('h'), at: now(), byRole: s.settings.role, byName: `Demo ${ROLE_LABELS[s.settings.role]}`, action: 'Purchase order raised', note: po.number };
+        const actorName = s.users.find((u) => u.id === s.settings.currentUserId)?.name ?? `Demo ${ROLE_LABELS[s.settings.role]}`;
+        const entry: HistoryEntry = { id: newId('h'), at: now(), byRole: s.settings.role, byName: actorName, action: 'Purchase order raised', note: po.number };
         set({
           purchaseOrders: [po, ...s.purchaseOrders],
           requests: s.requests.map((x) => (x.id === requestId ? { ...x, purchaseOrderId: po.id, history: [...x.history, entry], updatedAt: now() } : x)),
@@ -311,9 +368,30 @@ export const useStore = create<Store>()(
         for (const [k, v] of Object.entries(rest)) if (typeof v !== 'function') data[k] = v;
         return data as unknown as Store;
       },
-      version: 1,
+      version: STORE_VERSION,
+      migrate: (persisted, version) => {
+        // v1 -> v2: introduce demo users and module permissions without discarding the visitor's records.
+        const st = (persisted ?? {}) as Partial<DataState>;
+        if (version < 2 || !st.users) {
+          const users = seedUsers();
+          const role = st.settings?.role ?? 'manager';
+          const current = users.find((u) => u.role === role) ?? users[2];
+          return { ...st, users, settings: { ...(st.settings ?? buildSeed().settings), currentUserId: current.id } } as unknown as Store;
+        }
+        return st as unknown as Store;
+      },
     },
   ),
 );
+
+/** Current demo user, falling back to the first user when the id is stale. */
+export function selectCurrentUser(s: Pick<DataState, 'users' | 'settings'>): DemoUser {
+  return s.users.find((u) => u.id === s.settings.currentUserId) ?? s.users[0];
+}
+
+export function hasModule(u: DemoUser | undefined, key: ModuleKey): boolean {
+  if (!u) return false;
+  return u.isSuperAdmin || u.modules.includes(key);
+}
 
 export { ROLE_LABELS };

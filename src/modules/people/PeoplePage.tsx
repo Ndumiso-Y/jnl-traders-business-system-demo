@@ -3,7 +3,7 @@ import { IcoFlag, IcoPlus, IcoSearch, IcoTrash, IcoUsers } from '../../component
 import RoleBar from '../../components/RoleBar';
 import { Confirm, DueTag, Empty, Field, Modal, Notice, PageHeader, Panel, Stat, Tag, type TagTone } from '../../components/ui';
 import { dueState, formatDate, todayIso } from '../../lib/dates';
-import { useStore } from '../../store/useStore';
+import { hasModule, selectCurrentUser, useStore } from '../../store/useStore';
 import type { HrKind, HrRecord, HrStatus, IncidentSeverity, IncidentStatus, SafetyIncident } from '../../store/types';
 
 const HR_STATUS: Record<HrStatus, [string, TagTone]> = { open: ['Open', 'amber'], 'in-progress': ['In progress', 'blue'], closed: ['Closed', 'dark'] };
@@ -12,15 +12,16 @@ const SEV: Record<IncidentSeverity, TagTone> = { low: 'dark', medium: 'amber', h
 
 export default function PeoplePage() {
   const store = useStore();
-  const role = store.settings.role;
-  const [tab, setTab] = useState<'hr' | 'safety'>('hr');
+  const me = selectCurrentUser(store);
+  const hrVisible = hasModule(me, 'hr');
+  const safetyVisible = hasModule(me, 'safety');
+  const [tab, setTab] = useState<'hr' | 'safety'>(hrVisible ? 'hr' : 'safety');
   const [q, setQ] = useState('');
   const [hrEdit, setHrEdit] = useState<HrRecord | null>(null);
   const [incEdit, setIncEdit] = useState<SafetyIncident | null>(null);
   const [del, setDel] = useState<{ kind: 'hr' | 'inc'; id: string; ref: string } | null>(null);
   const [errs, setErrs] = useState<Record<string, string>>({});
 
-  const hrVisible = role === 'owner' || role === 'manager';
   const hr = useMemo(() => store.hrRecords.filter((r) => !q || [r.ref, r.subject, r.position, r.stage].some((v) => v.toLowerCase().includes(q.toLowerCase()))).sort((a, b) => b.date.localeCompare(a.date)), [store.hrRecords, q]);
   const inc = useMemo(() => store.incidents.filter((i) => !q || [i.ref, i.location, i.category, i.description].some((v) => v.toLowerCase().includes(q.toLowerCase()))).sort((a, b) => b.date.localeCompare(a.date)), [store.incidents, q]);
 
@@ -59,10 +60,10 @@ export default function PeoplePage() {
     <>
       <PageHeader kicker="People / HR & Safety" title="People & safety" subtitle="Representative fictional hiring, disciplinary and safety registers. Real HR data is never loaded in this demo."
         actions={tab === 'hr' ? <>{hrVisible && <button className="btn" onClick={() => newHr('disciplinary')} data-testid="new-disciplinary"><IcoPlus />Disciplinary record</button>}{hrVisible && <button className="btn primary" onClick={() => newHr('hiring')} data-testid="new-hiring"><IcoPlus />Hiring record</button>}</> : <button className="btn primary" onClick={newInc} data-testid="new-incident"><IcoPlus />Log incident</button>} />
-      <RoleBar note="HR records are shown to the Manager and Owner roles only (simulated). Safety reporting is open to all roles." />
+      <RoleBar note="HR records open only for users granted the HR module; the safety register only for users granted Safety. Granted by the Super Admin (simulated)." />
       <div className="tabs" role="tablist">
-        <button role="tab" aria-selected={tab === 'hr'} onClick={() => setTab('hr')} data-testid="tab-hr">HR records</button>
-        <button role="tab" aria-selected={tab === 'safety'} onClick={() => setTab('safety')} data-testid="tab-safety">Safety register</button>
+        {hrVisible && <button role="tab" aria-selected={tab === 'hr'} onClick={() => setTab('hr')} data-testid="tab-hr">HR records</button>}
+        {safetyVisible && <button role="tab" aria-selected={tab === 'safety'} onClick={() => setTab('safety')} data-testid="tab-safety">Safety register</button>}
       </div>
       <div className="stat-grid">
         <Stat label="Hiring in progress" value={store.hrRecords.filter((r) => r.kind === 'hiring' && r.status !== 'closed').length} sub="Fictional candidates (codes only)" />
@@ -72,7 +73,7 @@ export default function PeoplePage() {
       </div>
       <Panel title={tab === 'hr' ? 'HR register' : 'Safety incident register'} meta={tab === 'hr' ? 'Hiring and disciplinary records — fictional subjects identified by code only' : 'Incidents, near misses and follow-up actions — fictional'}>
         <div className="toolbar"><label className="search-box"><IcoSearch /><input placeholder="Search records" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Search records" /></label></div>
-        {tab === 'hr' && !hrVisible && <Notice tone="amber">HR records are hidden for the {role} role in this demonstration. Switch to Manager or Owner to view them. (Simulated restriction only.)</Notice>}
+        {tab === 'hr' && !hrVisible && <Notice tone="amber">{me.name} has not been granted the HR module. Ask the Super Admin (simulated restriction only).</Notice>}
         {tab === 'hr' && hrVisible && (
           <div className="table-wrap">
             <table className="table">
@@ -84,7 +85,7 @@ export default function PeoplePage() {
             </table>
           </div>
         )}
-        {tab === 'safety' && (
+        {tab === 'safety' && safetyVisible && (
           <div className="table-wrap">
             <table className="table">
               <thead><tr><th>Incident</th><th>Category</th><th>Severity</th><th>Date</th><th>Follow-up due</th><th>Status</th><th /></tr></thead>

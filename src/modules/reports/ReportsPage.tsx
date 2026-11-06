@@ -14,6 +14,7 @@ export default function ReportsPage() {
   const payments = useStore((s) => s.payments);
   const expenses = useStore((s) => s.expenses);
   const requests = useStore((s) => s.requests);
+  const purchaseOrders = useStore((s) => s.purchaseOrders);
   const assets = useStore((s) => s.assets);
   const addExpense = useStore((s) => s.addExpense);
   const deleteExpense = useStore((s) => s.deleteExpense);
@@ -40,6 +41,12 @@ export default function ReportsPage() {
 
   const outstandingTotal = invoices.filter((i) => i.status === 'issued').reduce((s, i) => s + Math.max(0, invoiceDerived(i, payments).balance), 0);
   const reqInRange = requests.filter((r) => r.createdAt.slice(0, 7) >= from && r.createdAt.slice(0, 7) <= to);
+  const poByMonth = range.map((m) => {
+    const pos = purchaseOrders.filter((p) => p.date.slice(0, 7) === m);
+    const value = pos.reduce((t, p) => t + p.items.reduce((x, it) => x + toCents(it.qty * it.estUnitCost), 0), 0);
+    return { key: m, count: pos.length, open: pos.filter((p) => p.status === 'open').length, received: pos.filter((p) => p.status === 'received').length, closed: pos.filter((p) => p.status === 'closed').length, value };
+  });
+  const poTotals = poByMonth.reduce((a, b) => ({ count: a.count + b.count, value: a.value + b.value }), { count: 0, value: 0 });
   const recentExpenses = [...expenses].filter((e) => e.date.slice(0, 7) >= from && e.date.slice(0, 7) <= to).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 12);
 
   const submit = (e: React.FormEvent) => {
@@ -116,12 +123,19 @@ export default function ReportsPage() {
           </div>
           <div style={{ marginTop: 14 }}><Notice tone="grey">"Received − costs" is a simple cash view of the demo records only. It excludes unpaid invoices, salaries not recorded, tax and any real accounting treatment.</Notice></div>
         </Panel>
-        <Panel title="Requests in range" meta="Procurement and PPE activity">
-          <div className="stat-grid" style={{ gridTemplateColumns: 'repeat(2, minmax(0,1fr))', gap: 12, marginBottom: 0 }}>
-            <Stat label="Raised" value={reqInRange.length} />
-            <Stat label="Approved / fulfilled" value={reqInRange.filter((r) => r.status === 'approved' || r.status === 'fulfilled').length} />
-            <Stat label="Rejected" value={reqInRange.filter((r) => r.status === 'rejected').length} />
-            <Stat label="Est. value approved" value={formatRand(reqInRange.filter((r) => r.status === 'approved' || r.status === 'fulfilled').reduce((s, r) => s + r.items.reduce((x, it) => x + toCents(it.qty * it.estUnitCost), 0), 0))} />
+        <Panel title="Purchase orders by period" meta="PO-period statistics from the fictional orders">
+          <div className="stat-grid" style={{ gridTemplateColumns: 'repeat(2, minmax(0,1fr))', gap: 12, marginBottom: 14 }}>
+            <Stat label="Requests raised" value={reqInRange.length} sub={`${reqInRange.filter((r) => r.status === 'approved' || r.status === 'fulfilled').length} approved · ${reqInRange.filter((r) => r.status === 'rejected').length} rejected`} />
+            <Stat label="Purchase orders" value={poTotals.count} sub={`${formatRand(poTotals.value)} estimated`} />
+          </div>
+          <div className="table-wrap">
+            <table className="table" data-testid="po-table">
+              <thead><tr><th>Month</th><th className="num">POs</th><th className="num">Open</th><th className="num">Received</th><th className="num">Closed</th><th className="num">Est. value</th></tr></thead>
+              <tbody>
+                {poByMonth.filter((b) => b.count > 0).map((b) => <tr key={b.key}><td><strong>{monthLabel(b.key)}</strong></td><td className="num">{b.count}</td><td className="num">{b.open}</td><td className="num">{b.received}</td><td className="num">{b.closed}</td><td className="num"><strong>{formatRand(b.value)}</strong></td></tr>)}
+                {poTotals.count === 0 && <tr><td colSpan={6}><Empty title="No purchase orders in range" /></td></tr>}
+              </tbody>
+            </table>
           </div>
         </Panel>
       </div>

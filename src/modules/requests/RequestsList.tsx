@@ -5,7 +5,7 @@ import RoleBar from '../../components/RoleBar';
 import { Empty, PageHeader, Panel, Stat, Tag } from '../../components/ui';
 import { formatRand } from '../../lib/money';
 import { formatDate, relativeWhen } from '../../lib/dates';
-import { useStore } from '../../store/useStore';
+import { selectCurrentUser, useStore } from '../../store/useStore';
 import type { RequestKind, RequestStatus } from '../../store/types';
 import { REQ_STATUS, requestEstimate } from './requestHelpers';
 
@@ -13,7 +13,9 @@ export default function RequestsList({ kind }: { kind: RequestKind }) {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const requests = useStore((s) => s.requests);
-  const role = useStore((s) => s.settings.role);
+  const users = useStore((s) => s.users);
+  const settings = useStore((s) => s.settings);
+  const canApprove = selectCurrentUser({ users, settings }).canApprove;
   const createRequest = useStore((s) => s.createRequest);
   const [q, setQ] = useState('');
   const status = (params.get('status') as RequestStatus | 'all' | null) ?? 'all';
@@ -41,7 +43,7 @@ export default function RequestsList({ kind }: { kind: RequestKind }) {
         </>} />
       <RoleBar />
       <div className="stat-grid">
-        <Stat label="Awaiting review" value={String(counts('submitted')).padStart(2, '0')} tone={counts('submitted') ? 'gold' : undefined} sub={role === 'requester' ? 'Managers or the Owner approve' : 'Ready for your decision'} />
+        <Stat label="Awaiting review" value={String(counts('submitted')).padStart(2, '0')} tone={counts('submitted') ? 'gold' : undefined} sub={canApprove ? 'Ready for your decision' : 'Awaiting an approver'} />
         <Stat label="Approved" value={String(counts('approved')).padStart(2, '0')} sub="Finance can raise a purchase order" />
         <Stat label="Fulfilled" value={String(counts('fulfilled')).padStart(2, '0')} sub="Closed out" />
         <Stat label="Rejected / drafts" value={`${counts('rejected')} / ${counts('draft')}`} sub="Returned or not yet submitted" />

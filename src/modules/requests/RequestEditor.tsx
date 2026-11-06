@@ -5,7 +5,7 @@ import RoleBar from '../../components/RoleBar';
 import { Confirm, Field, Modal, Notice, PageHeader, Panel, Tag } from '../../components/ui';
 import { formatRand, parseNumber } from '../../lib/money';
 import { addDays, formatDate, formatDateTime, todayIso } from '../../lib/dates';
-import { canTransition, newId, useStore } from '../../store/useStore';
+import { actorForUser, canTransition, newId, selectCurrentUser, useStore } from '../../store/useStore';
 import { ROLE_LABELS, type Request, type RequestItem, type RequestKind, type RequestStatus } from '../../store/types';
 import { REQ_STATUS, requestEstimate } from './requestHelpers';
 
@@ -19,6 +19,8 @@ function Editor({ kind, id }: { kind: RequestKind; id: string | undefined }) {
   const store = useStore();
   const source = store.requests.find((r) => r.id === id);
   const role = store.settings.role;
+  const me = selectCurrentUser(store);
+  const actor = actorForUser(me);
   const [draft, setDraft] = useState<Request | undefined>(source);
   const [dirty, setDirty] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
@@ -37,7 +39,8 @@ function Editor({ kind, id }: { kind: RequestKind; id: string | undefined }) {
     return <PageHeader kicker="Procurement" title="Request not found" subtitle="This record is not in the demo data for this browser." actions={<Link className="btn" to={base}>Back to list</Link>} />;
   }
 
-  const editable = draft.status === 'draft' && (role === draft.requesterRole || role === 'owner' || role === 'manager');
+  const isOwn = draft.requesterUserId ? draft.requesterUserId === me.id : draft.requesterRole === role;
+  const editable = draft.status === 'draft' && (isOwn || actor.overrideOwn || actor.canApprove);
   const errors: Record<string, string> = {};
   if (!draft.title.trim()) errors.title = 'Give the request a short title.';
   if (!draft.department.trim()) errors.department = 'Enter a department.';
@@ -63,8 +66,7 @@ function Editor({ kind, id }: { kind: RequestKind; id: string | undefined }) {
     return true;
   };
 
-  const isOwn = draft.requesterRole === role;
-  const can = (to: RequestStatus) => canTransition(role, draft.status, to, isOwn);
+  const can = (to: RequestStatus) => canTransition(actor, draft.status, to, isOwn);
 
   const act = (to: RequestStatus, withNote?: string) => {
     if (to === 'submitted' && dirty && !save()) return;
@@ -97,7 +99,7 @@ function Editor({ kind, id }: { kind: RequestKind; id: string | undefined }) {
     <>
       <PageHeader kicker={kind === 'ppe' ? 'Procurement / PPE' : 'Procurement / Requests'} title={`${kind === 'ppe' ? 'PPE' : 'Procurement'} request ${draft.number}`} subtitle="Draft → Submitted → Approved / Rejected → Fulfilled. Roles are simulated for the demonstration."
         actions={<Link className="btn" to={base}>Back</Link>} />
-      <RoleBar note={`Acting as ${ROLE_LABELS[role]}. Requesters cannot approve, and nobody except the Owner may approve their own request. This is a browser-side simulation only.`} />
+      <RoleBar note={`${me.name} ${actor.canApprove ? 'can approve requests' : 'cannot approve requests'}${actor.canFulfil ? ' and can raise purchase orders' : ''}. Nobody except an owner or super admin may approve their own request. Browser-side simulation only.`} />
 
       <div className="doc-grid">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -145,16 +147,16 @@ function Editor({ kind, id }: { kind: RequestKind; id: string | undefined }) {
                 const check = can(a.to);
                 return <button key={a.to} className={`btn ${a.cls}`} disabled={!check.ok} title={check.ok ? undefined : check.reason} aria-disabled={!check.ok} onClick={() => { if (!check.ok) { store.toast(check.reason ?? 'Not allowed.', 'err'); return; } if (a.needsNote) setDecision(a.to); else act(a.to); }} data-testid={a.testid}>{a.label}</button>;
               })}
-              {draft.status === 'approved' && !draft.purchaseOrderId && (role === 'finance' || role === 'manager' || role === 'owner') && <button className="btn gold" onClick={() => setPoOpen(true)} data-testid="raise-po">Raise purchase order</button>}
+              {draft.status === 'approved' && !draft.purchaseOrderId && actor.canFulfil && <button className="btn gold" onClick={() => setPoOpen(true)} data-testid="raise-po">Raise purchase order</button>}
             </div>
             {blocked.length > 0 && (
               <div style={{ marginTop: 14 }}>
                 <Notice tone="amber" >
-                  <b>Not available as {ROLE_LABELS[role]}:</b> {blocked.map((b) => `${b.label} — ${can(b.to).reason}`).join(' ')} <span style={{ opacity: .8 }}>(Simulated rule for the demo. Switch role above to continue the workflow.)</span>
+                  <b>Not available for {me.name}:</b> {blocked.map((b) => `${b.label} — ${can(b.to).reason}`).join(' ')} <span style={{ opacity: .8 }}>(Simulated rule for the demo. Switch role above to continue the workflow.)</span>
                 </Notice>
               </div>
             )}
-            {draft.status === 'approved' && role === 'finance' && <div style={{ marginTop: 14 }}><Notice tone="gold">Finance review: this request is approved and {po ? `linked to ${po.number}.` : 'ready for a purchase order.'}</Notice></div>}
+            {draft.status === 'approved' && me.canReviewFinance && <div style={{ marginTop: 14 }}><Notice tone="gold">Finance review: this request is approved and {po ? `linked to ${po.number}.` : 'ready for a purchase order.'}</Notice></div>}
           </Panel>
         </div>
 

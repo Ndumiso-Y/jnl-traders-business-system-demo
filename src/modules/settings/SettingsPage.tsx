@@ -31,7 +31,7 @@ export default function SettingsPage() {
   return (
     <>
       <PageHeader kicker="Workspace / Settings" title="Settings & demo reset" subtitle="Demonstration defaults stored in this browser only." />
-      <RoleBar />
+      <RoleBar note="Settings and the demo reset stay open to every simulated user so the walkthrough can always be restored. Permissions are managed under Users & permissions." />
       <div className="grid-2-even">
         <Panel title="Demonstration defaults" meta="Applied to new documents">
           <form onSubmit={save} className="form-grid">
@@ -53,7 +53,7 @@ export default function SettingsPage() {
           <p className="field-hint" style={{ marginTop: 10 }}>Restores the fictional starting set and discards every change made in this browser.</p>
         </Panel>
       </div>
-      <Notice tone="dark"><b>What this demo is</b>A static, browser-only prototype on GitHub Pages. Data lives in localStorage on this device and does not sync. Roles are simulated. No login, server, email, payment or integration exists. It is not a secure production application.</Notice>
+      <Notice tone="dark"><b>What this demo is</b>A static, browser-only prototype on GitHub Pages. Data lives in localStorage on this device and does not sync. Users, roles and permissions are simulated. No login, server, email, payment or integration exists. It is not a secure production application.</Notice>
       <Confirm open={confirm} title="Reset all demo data?" danger confirmLabel="Reset demo" onCancel={() => setConfirm(false)} onConfirm={() => { setConfirm(false); resetDemo(); setVat('15'); setCompany('JNL Traders'); }} body="Every quotation, invoice, payment, request, asset, cost, HR record and incident you changed or created in this browser will be deleted and replaced with the fictional starting set. This cannot be undone." />
     </>
   );

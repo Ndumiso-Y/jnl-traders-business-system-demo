@@ -13,7 +13,7 @@ future system. It is separate from the existing two-website engagement and carri
 | Statements | Per-customer running statement derived from issued invoices and recorded payments; totals; PDF |
 | Customers | Add / edit fictional customers with validation |
 | Procurement & PPE | Draft → Submitted → Approved / Rejected → Fulfilled; optional decision comment; chronological history with role and timestamp; purchase-order creation from approved requests; PO status progression; dashboard counts update |
-| Simulated roles | Requester / Manager / Finance / Owner switcher. Requester cannot approve or reject; nobody but the Owner may approve their own request; Finance reviews approved requests and raises POs; HR records and the Owner view are hidden from other roles |
+| Users & permissions | Eight fictional users with module-scoped access, as requested in the 14 October meeting: the Super Admin sees everything and grants or revokes each user's modules (Overview, Finance, Procurement, PPE, Fleet, Reports, HR, Safety, Owner view, Users & permissions) plus approval and finance-review rights; Finance sees finance, HR sees HR, Fleet sees fleet; hidden modules disappear from navigation and direct links show a "No access" page; nobody except an owner or super admin may approve their own request; add/remove demo users; changes persist in the browser and older saved data migrates automatically |
 | Fleet & equipment | Vehicle and equipment register; make / model / registration / year / status / assignment / odometer; service, licence, insurance, inspection dates with due-soon (30 days) and overdue states computed from today; search and filters; add / edit / delete |
 | Reports | Date-range monthly aggregates of invoices issued, payments received and recorded costs (kept separate, never labelled profit); cost register with categories and asset links |
 | HR & safety | Representative hiring and disciplinary records (codes only) and a safety incident register with follow-up dates |
@@ -22,7 +22,7 @@ future system. It is separate from the existing two-website engagement and carri
 
 ## Simulated (looks real, is not)
 
-- **Roles and the owner-only page.** Enforced only in browser JavaScript. Anyone with the link can switch roles. A public static site cannot protect confidential data.
+- **Users, permissions and the owner-only page.** Enforced only in browser JavaScript. Anyone with the link can switch users from the top bar. A public static site cannot protect confidential data; the model shows intent, not security.
 - **Persistence.** Records live in the visitor's browser only. A second browser, device or private window starts from the seed. Nothing syncs and nothing is backed up.
 - **Documents.** PDFs are watermarked "DEMONSTRATION / NOT A VALID TAX INVOICE". Numbering (`Q-D…`, `INV-D…`, `REQ-D…`, `PO-D…`) is a demo scheme. VAT at 15% is a configurable demonstration default and says nothing about JNL's VAT registration or compliance.
 - **Payments and statements.** Fictional entries typed into the demo. No bank, email or accounting integration.
@@ -45,6 +45,7 @@ statement templates and numbering; VAT treatment; real roles, approvers and limi
 
 1. Which of the demonstrated modules matter most, and which are missing entirely?
 2. Who approves procurement and PPE requests today, with what limits, and does Finance need a separate step?
+2a. Does the proposed user list (super admin, owner, supervisor, finance, procurement, HR, fleet, requester) match the real people, and should any module be shared between departments?
 3. What do current quotations, invoices and statements look like (templates, numbering, VAT, terms)?
 4. Which reports are produced monthly now, for whom, and what do "costs" include?
 5. Which vehicles / equipment renewals are tracked today and where does the reminder need to arrive?

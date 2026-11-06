@@ -345,6 +345,21 @@ table { border-collapse: collapse; width: 100%; }
 .tabs a, .tabs button { text-decoration: none; border: 0; background: none; padding: 10px 14px; font-size: 13px; font-weight: 700; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
 .tabs a.active, .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--gold); }
 
+/* ---------- User switcher (top bar) ---------- */
+.user-switch { position: relative; display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px 0 4px; border: 1px solid #e5e5e0; background: #fff; border-radius: 100px; cursor: pointer; max-width: 300px; }
+.user-switch:hover { border-color: #cfd0c9; }
+.user-switch-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; }
+.user-switch-text b { font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-switch-text small { font-size: 10px; color: var(--muted-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-switch select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.user-switch:focus-within { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* ---------- Permission matrix ---------- */
+.table.matrix th.center, .table.matrix td.center { text-align: center; padding-left: 6px; padding-right: 6px; }
+.table.matrix td:first-child { min-width: 190px; }
+.matrix-check { width: 17px; height: 17px; accent-color: #262c26; margin: 0; cursor: pointer; }
+.matrix-check:disabled { cursor: not-allowed; opacity: .55; }
+
 /* ---------- Mobile nav drawer ---------- */
 .drawer-backdrop { display: none; }
 
@@ -375,6 +390,8 @@ table { border-collapse: collapse; width: 100%; }
   .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
   .menu-button { display: inline-flex; }
   .topbar .search-box { display: none; }
+  .user-switch-text { display: none; }
+  .user-switch { padding: 0 4px; max-width: none; }
   .topbar { padding: 0 var(--content-x); }
   .content { padding-top: 22px; }
   .page-title { font-size: 27px; }

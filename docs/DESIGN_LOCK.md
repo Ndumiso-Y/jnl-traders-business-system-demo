@@ -53,6 +53,7 @@ Implemented as CSS custom properties in `src/styles/app.css`.
 | `#/reports` | 01 chart language | Implemented |
 | `#/people` | 02 register pattern (tabs: HR / Safety) | Implemented |
 | `#/owner` | 01 stat/panel language | Implemented (simulated restriction) |
+| `#/admin` Users & permissions | 02 register pattern (matrix table) | Implemented (Super Admin only) |
 | `#/settings`, `#/search` | shell patterns | Implemented |
 
 ## Deliberate deviations from the mockups
@@ -61,7 +62,7 @@ Implemented as CSS custom properties in `src/styles/app.css`.
 2. **"This month" button** on the Overview links to Reports rather than opening a date menu (no dead control).
 3. **Fleet illustration** is a simple inline SVG generic truck labelled "Generic illustration · not a JNL asset", lighter than the mockup's rendered vehicle, to avoid implying a real asset and to keep the bundle small.
 4. **Mockup 03's "Prototype goal" notice** referencing the Manus version is replaced by a "Demonstration boundary" notice (Manus is no longer the executor).
-5. **Role bar** (segmented Requester / Manager / Finance / Owner control) is an addition required by the brief; it is styled with the gold notice tokens so it reads as a demo control.
+5. **User switcher** (top-bar "Signed in as" pill and the gold "Signed in as" bar on workflow pages) replaces the mockups' static avatar; it is required by the brief's role simulation and the meeting's super-admin request, and is styled with the gold notice tokens so it reads as a demo control.
 6. **Mobile** uses a slide-in drawer for the sidebar; mockup 04 only shows the closed state.
 
 ## Locked / regression rule

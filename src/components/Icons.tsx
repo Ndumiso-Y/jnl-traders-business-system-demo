@@ -34,3 +34,4 @@ export const IcoRefresh = (p: P) => (<svg {...base(p)}><path d="M20 11a8 8 0 0 0
 export const IcoPrint = (p: P) => (<svg {...base(p)}><path d="M7 8V4h10v4" /><rect x="4" y="8" width="16" height="8" rx="2" /><path d="M7 14h10v6H7z" /></svg>);
 export const IcoWallet = (p: P) => (<svg {...base(p)}><rect x="3" y="6" width="18" height="13" rx="2" /><path d="M16 12h5v3h-5a1.5 1.5 0 0 1 0-3Z" /><path d="M3 9h18" /></svg>);
 export const IcoFlag = (p: P) => (<svg {...base(p)}><path d="M6 21V4" /><path d="M6 4h12l-3 4 3 4H6" /></svg>);
+export const IcoKey = (p: P) => (<svg {...base(p)}><circle cx="8" cy="14" r="4" /><path d="M11 11 20 2" /><path d="M16 6l3 3" /><path d="M13 9l2 2" /></svg>);
