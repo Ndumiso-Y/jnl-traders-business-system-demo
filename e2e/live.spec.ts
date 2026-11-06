@@ -16,8 +16,11 @@ test('live Pages URL serves the app, assets and deep links with no console error
   const res = await page.goto('');
   expect(res?.status()).toBe(200);
   await expect(page.getByRole('heading', { name: 'Business overview' })).toBeVisible();
+  await page.getByTestId('user-switcher').selectOption('u_admin'); // super admin sees every module
   await page.getByRole('link', { name: 'Finance', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Quotations & invoices', level: 1 })).toBeVisible();
+  await page.goto('#/admin');
+  await expect(page.getByTestId('matrix')).toBeVisible();
   await page.goto('#/fleet');
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Fleet & equipment', level: 1 })).toBeVisible();
