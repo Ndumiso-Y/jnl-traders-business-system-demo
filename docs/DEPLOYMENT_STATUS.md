@@ -22,6 +22,7 @@ or real business data exist in the repository.
 
 | Date (SAST) | Commit | Workflow run | Result | Live checks performed |
 | --- | --- | --- | --- | --- |
+| 16 Nov 2026 | `eefdef6` | https://github.com/Ndumiso-Y/jnl-traders-business-system-demo/actions/runs/43838597056 | build ✓ deploy ✓ | **Properties & tenants release (layout-fixed).** `curl` shows the Pages URL serving `assets/index-vS24KdKg.js`. Playwright live spec against the Pages URL — **1 passed (2.7s)**. Note: the preceding commit `5d691f9` (run 43837986360) went live with a horizontal-overflow defect on the tenants page at 1024/768/390 px for about ten minutes; `eefdef6` corrected it and the full suite (26 passed) was re-run before pushing. |
 | 06 Nov 2026 | `155f8d3` | https://github.com/Ndumiso-Y/jnl-traders-business-system-demo/actions/runs/42176114189 | build ✓ deploy ✓ | **Users & permissions release.** `curl` shows the Pages URL serving `assets/index-SZil6A_A.js`. Playwright live spec against the Pages URL — **1 passed (3.1s)**: HTTP 200, switch to Super Admin, Finance navigation, `#/admin` matrix visible, `#/fleet` deep link + hard refresh, CSS applied, no 4xx, no console errors. (First live run failed because the spec still clicked Finance as the Supervisor, who no longer has that module; the spec was corrected, not the app.) |
 | 04 Nov 2026 23:58 | `30b786d` | https://github.com/Ndumiso-Y/jnl-traders-business-system-demo/actions/runs/41919785414 | build ✓ deploy ✓ | **Final release.** `curl` shows the Pages URL serving `assets/index-DAPuPGLj.js` (same hash as the local build). Playwright live spec against the Pages URL — **1 passed (8.0s)**: HTTP 200, navigation, deep link + hard refresh, CSS applied, no 4xx, no console errors. |
 | 04 Nov 2026 23:45 | `143e530` | https://github.com/Ndumiso-Y/jnl-traders-business-system-demo/actions/runs/41918968121 | build ✓ deploy ✓ | Playwright `e2e/live.spec.ts` against the Pages URL: HTTP 200, Finance navigation, `#/fleet` deep link + reload, sidebar CSS applied, no 4xx, no console errors — **1 passed (3.9s)**. |
@@ -30,7 +31,7 @@ or real business data exist in the repository.
 
 ## Blockers
 
-None. Pages is enabled and deploys automatically on every push to `main`. Commits after `155f8d3` that touch only `docs/` or `e2e/` do not change the application.
+None. Pages is enabled and deploys automatically on every push to `main`. Commits after `eefdef6` that touch only `docs/` or `e2e/` do not change the application.
 
 ## Known deployment limitations
 
