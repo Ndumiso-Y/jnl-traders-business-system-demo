@@ -15,7 +15,7 @@ export const ROLE_LABELS: Record<Role, string> = {
 };
 
 /** Modules a demo user can be granted. 'admin' is the Users & permissions screen. */
-export type ModuleKey = 'overview' | 'finance' | 'procurement' | 'ppe' | 'fleet' | 'reports' | 'hr' | 'safety' | 'owner' | 'admin';
+export type ModuleKey = 'overview' | 'finance' | 'procurement' | 'ppe' | 'fleet' | 'tenants' | 'reports' | 'hr' | 'safety' | 'owner' | 'admin';
 
 export const MODULES: Array<{ key: ModuleKey; label: string; path: string; short: string }> = [
   { key: 'overview', label: 'Overview', path: '/', short: 'Overview' },
@@ -23,6 +23,7 @@ export const MODULES: Array<{ key: ModuleKey; label: string; path: string; short
   { key: 'procurement', label: 'Procurement', path: '/procurement', short: 'Procure.' },
   { key: 'ppe', label: 'PPE requests', path: '/ppe', short: 'PPE' },
   { key: 'fleet', label: 'Fleet & equipment', path: '/fleet', short: 'Fleet' },
+  { key: 'tenants', label: 'Properties & tenants', path: '/tenants', short: 'Tenants' },
   { key: 'reports', label: 'Reports', path: '/reports', short: 'Reports' },
   { key: 'hr', label: 'HR records', path: '/people', short: 'HR' },
   { key: 'safety', label: 'Safety register', path: '/people', short: 'Safety' },
@@ -222,10 +223,39 @@ export type SafetyIncident = {
   createdAt: string;
 };
 
+export type PropertyType = 'residential' | 'commercial' | 'mixed' | 'industrial';
+export type Property = { id: string; ref: string; name: string; address: string; type: PropertyType; notes: string; createdAt: string };
+
+export type UnitStatus = 'vacant' | 'occupied' | 'maintenance';
+export type Unit = { id: string; propertyId: string; ref: string; description: string; rent: number; status: UnitStatus; notes: string };
+
+export type TenantStatus = 'active' | 'notice' | 'ended';
+export type Tenant = {
+  id: string;
+  ref: string;
+  name: string; // fictional
+  contact: string;
+  phone: string;
+  email: string;
+  propertyId?: string;
+  unitId?: string;
+  unitRef?: string; // denormalised for ledger lines
+  leaseStart: string;
+  leaseEnd?: string;
+  rent: number; // rand per month
+  deposit: number; // rand
+  status: TenantStatus;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type RentPayment = { id: string; tenantId: string; date: string; amount: number; method: 'eft' | 'cash' | 'debit-order' | 'other'; reference: string; createdAt: string };
+
 export type Activity = {
   id: string;
   at: string;
-  area: 'Finance' | 'Procurement' | 'PPE' | 'Fleet' | 'Equipment' | 'HR' | 'Safety' | 'System';
+  area: 'Finance' | 'Procurement' | 'PPE' | 'Fleet' | 'Equipment' | 'Tenants' | 'HR' | 'Safety' | 'System';
   title: string;
   detail: string;
   status: string;
@@ -248,6 +278,8 @@ export type Counters = {
   asset: number;
   hr: number;
   incident: number;
+  property: number;
+  tenant: number;
 };
 
 export type DataState = {
@@ -266,5 +298,9 @@ export type DataState = {
   expenses: Expense[];
   hrRecords: HrRecord[];
   incidents: SafetyIncident[];
+  properties: Property[];
+  units: Unit[];
+  tenants: Tenant[];
+  rentPayments: RentPayment[];
   activity: Activity[];
 };

@@ -1,6 +1,6 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import type { Customer, Invoice, Payment, Quotation } from '../store/types';
+import type { Customer, Invoice, Payment, Quotation, Tenant } from '../store/types';
 import { computeTotals, formatRand, toCents } from './money';
 import { formatDate } from './dates';
 import { buildStatementLines } from './statement';
@@ -154,6 +154,34 @@ export function buildStatementPdf(customer: Customer, invoices: Invoice[], payme
   });
   let y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
   const rows: Array<[string, string, boolean?]> = [['Total invoiced', formatRand(s.invoiced)], ['Total received', formatRand(s.received)], ['Balance outstanding', formatRand(s.balance), true]];
+  for (const [label, value, bold] of rows) {
+    doc.setFont('helvetica', bold ? 'bold' : 'normal'); doc.setFontSize(bold ? 12 : 9.5); doc.setTextColor(...(bold ? INK : MUTED));
+    doc.text(label, 130, y); doc.setTextColor(...INK); doc.text(value, 194, y, { align: 'right' }); y += bold ? 8 : 6;
+  }
+  stamp(doc);
+  return doc;
+}
+
+export function buildRentStatementPdf(tenant: Tenant, propertyName: string, lines: Array<{ date: string; ref: string; description: string; debit: number; credit: number; balance: number }>, totals: { charged: number; paid: number; balance: number }, companyName: string, asOf: string): jsPDF {
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  header(doc, 'Rent statement', `${tenant.ref} · as at ${formatDate(asOf)}`, companyName);
+  doc.setFontSize(7.5); doc.setTextColor(...MUTED); doc.setFont('helvetica', 'bold');
+  doc.text('TENANT (FICTIONAL)', 16, 42);
+  doc.text('LEASE', 120, 42);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(...INK);
+  doc.text([tenant.name || tenant.ref, propertyName, tenant.unitRef ?? ''].filter(Boolean), 16, 47);
+  doc.text([`From ${formatDate(tenant.leaseStart)}${tenant.leaseEnd ? ` to ${formatDate(tenant.leaseEnd)}` : ' (open-ended)'}`, `Rent: ${formatRand(Math.round(tenant.rent * 100))} per month`, `Status: ${tenant.status}`], 120, 47);
+  autoTable(doc, {
+    startY: 64,
+    head: [['Date', 'Reference', 'Description', 'Charged', 'Received', 'Balance']],
+    body: lines.map((l) => [formatDate(l.date), l.ref, l.description, l.debit ? formatRand(l.debit) : '', l.credit ? formatRand(l.credit) : '', formatRand(l.balance)]),
+    styles: { font: 'helvetica', fontSize: 8.5, textColor: INK, cellPadding: 2.6, lineColor: LINE, lineWidth: 0.2 },
+    headStyles: { fillColor: [247, 247, 244], textColor: MUTED, fontStyle: 'bold', fontSize: 7.5 },
+    columnStyles: { 3: { halign: 'right' }, 4: { halign: 'right' }, 5: { halign: 'right', fontStyle: 'bold' } },
+    margin: { left: 16, right: 16 },
+  });
+  let y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
+  const rows: Array<[string, string, boolean?]> = [['Total charged', formatRand(totals.charged)], ['Total received', formatRand(totals.paid)], ['Balance outstanding', formatRand(totals.balance), true]];
   for (const [label, value, bold] of rows) {
     doc.setFont('helvetica', bold ? 'bold' : 'normal'); doc.setFontSize(bold ? 12 : 9.5); doc.setTextColor(...(bold ? INK : MUTED));
     doc.text(label, 130, y); doc.setTextColor(...INK); doc.text(value, 194, y, { align: 'right' }); y += bold ? 8 : 6;

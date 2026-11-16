@@ -16,9 +16,13 @@ built by Embark Digitals as a discovery prototype. It is **not** a production sy
   the checks performed on each release are recorded in `docs/DEPLOYMENT_STATUS.md`.
 
 Open the URL in any modern browser. Use the **Signed in as** switcher in the top bar to move between fictional
-users (Super Admin, Owner, Supervisor, Finance Clerk, Procurement Officer, HR Officer, Fleet Controller, Requester).
+users (Super Admin, Owner, Supervisor, Finance Clerk, Procurement Officer, Property Manager, HR Officer, Fleet Controller, Requester).
 Each user sees only the modules granted to them; the Super Admin sees everything and grants or revokes module
 access and approval rights under **Users & permissions**. Settings → Reset restores the fictional starting data.
+
+## Modules
+
+Overview · Finance (quotations, invoices, payments, statements, customers) · Procurement and PPE requests with approvals and purchase orders · Fleet & equipment with renewal tracking · Properties & tenants (properties, units, leases, monthly rent ledger with arrears, rent statements) · Reports · People & safety (HR and incident registers) · Owner view · Users & permissions · Settings.
 
 ## Documentation
 

@@ -2,14 +2,14 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type {
   Activity, Asset, Customer, DataState, DemoUser, Expense, HrRecord, HistoryEntry, Invoice, LineItem, ModuleKey,
-  Payment, PurchaseOrder, Quotation, Request, RequestItem, RequestStatus, Role, SafetyIncident, Settings,
+  Payment, Property, PurchaseOrder, Quotation, RentPayment, Request, RequestItem, RequestStatus, Role, SafetyIncident, Settings, Tenant, Unit,
 } from './types';
 import { ROLE_LABELS } from './types';
-import { buildSeed, seedUsers } from './seed';
+import { buildSeed, seedProperties, seedUsers } from './seed';
 import { addDays, todayIso } from '../lib/dates';
 
 export const STORAGE_KEY = 'jnl-bms-demo-v1';
-export const STORE_VERSION = 2;
+export const STORE_VERSION = 3;
 
 let seq = Date.now() % 100000;
 export function newId(prefix: string): string {
@@ -72,6 +72,18 @@ export type Actions = {
   createIncident: () => SafetyIncident;
   updateIncident: (id: string, patch: Partial<SafetyIncident>) => void;
   deleteIncident: (id: string) => void;
+  // properties & tenants
+  createProperty: () => Property;
+  updateProperty: (id: string, patch: Partial<Property>) => void;
+  deleteProperty: (id: string) => { ok: boolean; reason?: string };
+  addUnit: (propertyId: string) => Unit;
+  updateUnit: (id: string, patch: Partial<Unit>) => void;
+  deleteUnit: (id: string) => { ok: boolean; reason?: string };
+  createTenant: () => Tenant;
+  updateTenant: (id: string, patch: Partial<Tenant>) => void;
+  deleteTenant: (id: string) => void;
+  addRentPayment: (p: Omit<RentPayment, 'id' | 'createdAt'>) => RentPayment;
+  deleteRentPayment: (id: string) => void;
   // activity
   logActivity: (a: Omit<Activity, 'id' | 'at'>) => void;
 };
@@ -346,6 +358,69 @@ export const useStore = create<Store>()(
       updateHrRecord: (id, patch) => set((s) => ({ hrRecords: s.hrRecords.map((r) => (r.id === id ? { ...r, ...patch } : r)) })),
       deleteHrRecord: (id) => set((s) => ({ hrRecords: s.hrRecords.filter((r) => r.id !== id) })),
 
+      // --- properties & tenants --------------------------------------------------
+      createProperty: () => {
+        const s = get();
+        const n = s.counters.property;
+        const p: Property = { id: newId('prp'), ref: `PRP-D${pad(n, 3)}`, name: '', address: '', type: 'commercial', notes: '', createdAt: now() };
+        set({ properties: [...s.properties, p], counters: { ...s.counters, property: n + 1 } });
+        return p;
+      },
+      updateProperty: (id, patch) => set((s) => ({ properties: s.properties.map((p) => (p.id === id ? { ...p, ...patch } : p)) })),
+      deleteProperty: (id) => {
+        const s = get();
+        if (s.tenants.some((t) => t.propertyId === id && t.status !== 'ended')) return { ok: false, reason: 'End or move the active tenants first.' };
+        set({ properties: s.properties.filter((p) => p.id !== id), units: s.units.filter((u) => u.propertyId !== id) });
+        return { ok: true };
+      },
+      addUnit: (propertyId) => {
+        const u: Unit = { id: newId('unit'), propertyId, ref: '', description: '', rent: 0, status: 'vacant', notes: '' };
+        set((s) => ({ units: [...s.units, u] }));
+        return u;
+      },
+      updateUnit: (id, patch) => set((s) => ({ units: s.units.map((u) => (u.id === id ? { ...u, ...patch } : u)) })),
+      deleteUnit: (id) => {
+        const s = get();
+        if (s.tenants.some((t) => t.unitId === id && t.status !== 'ended')) return { ok: false, reason: 'This unit has an active tenant.' };
+        set({ units: s.units.filter((u) => u.id !== id) });
+        return { ok: true };
+      },
+      createTenant: () => {
+        const s = get();
+        const n = s.counters.tenant;
+        const t: Tenant = { id: newId('ten'), ref: `TEN-D${pad(n, 3)}`, name: '', contact: '', phone: '', email: '', leaseStart: todayIso(), leaseEnd: addDays(todayIso(), 364), rent: 0, deposit: 0, status: 'active', notes: '', createdAt: now(), updatedAt: now() };
+        set({ tenants: [t, ...s.tenants], counters: { ...s.counters, tenant: n + 1 } });
+        return t;
+      },
+      updateTenant: (id, patch) => {
+        set((s) => {
+          const before = s.tenants.find((t) => t.id === id);
+          const next = { ...before, ...patch, updatedAt: now() } as Tenant;
+          // keep unit occupancy in step with the tenant's unit and status
+          const units = s.units.map((u) => {
+            if (before?.unitId && u.id === before.unitId && u.id !== next.unitId && u.status === 'occupied') return { ...u, status: 'vacant' as const };
+            if (u.id === next.unitId) return { ...u, status: next.status === 'ended' ? ('vacant' as const) : ('occupied' as const) };
+            return u;
+          });
+          const unit = units.find((u) => u.id === next.unitId);
+          return { tenants: s.tenants.map((t) => (t.id === id ? { ...next, propertyId: unit?.propertyId ?? next.propertyId, unitRef: unit?.ref ?? next.unitRef } : t)), units };
+        });
+        const t = get().tenants.find((x) => x.id === id);
+        if (t) get().logActivity({ area: 'Tenants', title: 'Tenant record updated', detail: `${t.ref} · ${t.name || 'unnamed'}`, status: t.status, tone: t.status === 'active' ? 'green' : t.status === 'notice' ? 'amber' : 'dark' });
+      },
+      deleteTenant: (id) => set((s) => {
+        const t = s.tenants.find((x) => x.id === id);
+        return { tenants: s.tenants.filter((x) => x.id !== id), rentPayments: s.rentPayments.filter((p) => p.tenantId !== id), units: s.units.map((u) => (t?.unitId === u.id ? { ...u, status: 'vacant' as const } : u)) };
+      }),
+      addRentPayment: (p) => {
+        const payment: RentPayment = { ...p, id: newId('rp'), createdAt: now() };
+        set((s) => ({ rentPayments: [...s.rentPayments, payment] }));
+        const t = get().tenants.find((x) => x.id === p.tenantId);
+        get().logActivity({ area: 'Tenants', title: 'Rent payment recorded', detail: `${t?.ref ?? ''} · R${p.amount.toFixed(2)} (fictional)`, status: 'Received', tone: 'green' });
+        return payment;
+      },
+      deleteRentPayment: (id) => set((s) => ({ rentPayments: s.rentPayments.filter((p) => p.id !== id) })),
+
       // --- safety ------------------------------------------------------------
       createIncident: () => {
         const s = get();
@@ -377,6 +452,13 @@ export const useStore = create<Store>()(
           const role = st.settings?.role ?? 'manager';
           const current = users.find((u) => u.role === role) ?? users[2];
           return { ...st, users, settings: { ...(st.settings ?? buildSeed().settings), currentUserId: current.id } } as unknown as Store;
+        }
+        if (version < 3 || !st.properties) {
+          // v2 -> v3: add properties & tenants, grant the module to super admins / owners, add the property manager.
+          const seeded = seedProperties();
+          const users = (st.users ?? seedUsers()).map((u) => (u.isSuperAdmin || u.role === 'owner' ? { ...u, modules: u.modules.includes('tenants') ? u.modules : [...u.modules, 'tenants' as const] } : u));
+          if (!users.some((u) => u.id === 'u_property')) users.push(seedUsers().find((u) => u.id === 'u_property')!);
+          return { ...st, users, ...seeded, counters: { ...(st.counters ?? buildSeed().counters), property: 4, tenant: 11 } } as unknown as Store;
         }
         return st as unknown as Store;
       },

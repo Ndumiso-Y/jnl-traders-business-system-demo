@@ -53,6 +53,7 @@ Implemented as CSS custom properties in `src/styles/app.css`.
 | `#/reports` | 01 chart language | Implemented |
 | `#/people` | 02 register pattern (tabs: HR / Safety) | Implemented |
 | `#/owner` | 01 stat/panel language | Implemented (simulated restriction) |
+| `#/tenants` Properties & tenants | 02 register pattern (tabs: properties & units, tenants & leases, rent ledger) + 03 statement pattern | Implemented |
 | `#/admin` Users & permissions | 02 register pattern (matrix table) | Implemented (Super Admin only) |
 | `#/settings`, `#/search` | shell patterns | Implemented |
 

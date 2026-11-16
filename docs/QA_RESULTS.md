@@ -1,5 +1,28 @@
 # QA results
 
+## Update — 16 November 2026: properties & tenants release
+
+```
+> vitest run          33 passed (33)   (new: tests/rent.test.ts — charged months, arrears, credit balances, ledger order)
+> eslint src          (no errors, no warnings)
+> tsc -b              (no errors)
+> vite build          main chunk 521.32 kB (gzip 154.55 kB); pdf chunk lazy 425.75 kB
+> playwright test     26 passed, 1 skipped (live spec without LIVE_URL)
+```
+
+| Requirement | Result | Evidence |
+| --- | --- | --- |
+| Properties with units and occupancy | **PASS** | `tenants.spec.ts`: three seeded properties listed for the Property Manager; adding a tenant to a vacant unit changes the occupancy stat and the unit row shows the tenant |
+| Tenants with leases, validation and lease-ending flag | **PASS** | Empty name and missing unit blocked; lease end before start blocked; saved tenant shows a lease flag |
+| Monthly rent ledger, payments, arrears | **PASS** | Unit tests: 4 months + deposit charged, 2 months in arrears, payment clears balance, overpayment shows credit. Browser: seeded tenant in arrears, zero amount rejected, recording R8,900 changes the balance and the Rent arrears stat; survives reload |
+| Rent statement PDF | **PASS** | Download starts with `%PDF-`, contains the demo stamp and the tenant reference |
+| Module gated by permissions | **PASS** | Property Manager and Owner open it; Finance Clerk gets No access |
+| Existing browser data keeps working | **PASS** | v2 saved state without properties migrates: properties seeded, module granted to super admin/owner, Property Manager user added |
+
+First run had one failure, test-side only (the unit reference sits in an input, so a text match could not find "Flat 4"); the assertion was changed to look for the tenant name in the unit table. Screenshots added: `qa/screenshots/*-tenants.png` at the four widths.
+
+---
+
 ## Update — 06 November 2026: users & permissions release
 
 ```

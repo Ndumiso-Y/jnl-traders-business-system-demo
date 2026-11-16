@@ -16,6 +16,8 @@ export default function SearchPage() {
   for (const x of s.requests) if (can(x.kind === 'ppe' ? 'ppe' : 'procurement') && hit(x.number, x.title, x.department, x.requesterName)) results.push({ area: x.kind === 'ppe' ? 'PPE request' : 'Procurement request', title: `${x.number} · ${x.title}`, sub: x.status, to: `${x.kind === 'ppe' ? '/ppe' : '/procurement'}/requests/${x.id}` });
   if (can('procurement')) for (const x of s.purchaseOrders) if (hit(x.number, x.supplier)) results.push({ area: 'Purchase order', title: x.number, sub: x.supplier, to: '/procurement/orders' });
   if (can('fleet')) for (const x of s.assets) if (hit(x.ref, x.name, x.make, x.model, x.registration)) results.push({ area: x.kind === 'vehicle' ? 'Vehicle' : 'Equipment', title: `${x.ref} · ${x.name}`, sub: `${x.make} ${x.model}`, to: `/fleet/${x.id}` });
+  if (can('tenants')) for (const x of s.properties) if (hit(x.ref, x.name, x.address)) results.push({ area: 'Property', title: `${x.ref} · ${x.name}`, sub: x.address, to: '/tenants?tab=properties' });
+  if (can('tenants')) for (const x of s.tenants) if (hit(x.ref, x.name, x.unitRef)) results.push({ area: 'Tenant', title: `${x.ref} · ${x.name}`, sub: x.unitRef ?? '', to: `/tenants?tab=ledger&tenant=${x.id}` });
   if (can('hr')) for (const x of s.hrRecords) if (hit(x.ref, x.subject, x.position)) results.push({ area: 'HR record', title: `${x.ref} · ${x.subject}`, sub: x.position, to: '/people' });
   if (can('safety')) for (const x of s.incidents) if (hit(x.ref, x.location, x.category, x.description)) results.push({ area: 'Safety incident', title: `${x.ref} · ${x.category}`, sub: x.location, to: '/people' });
 

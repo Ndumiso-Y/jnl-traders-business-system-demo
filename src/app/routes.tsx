@@ -19,6 +19,7 @@ import OwnerPage from '../modules/owner/OwnerPage';
 import SettingsPage from '../modules/settings/SettingsPage';
 import SearchPage from '../modules/search/SearchPage';
 import UsersPage from '../modules/admin/UsersPage';
+import TenantsPage from '../modules/tenants/TenantsPage';
 import RequireModule from '../components/RequireModule';
 
 export const routes: RouteObject[] = [
@@ -47,6 +48,7 @@ export const routes: RouteObject[] = [
       { path: 'ppe/requests/:id', element: <RequireModule anyOf={['ppe']}><RequestEditor kind="ppe" /></RequireModule> },
       { path: 'fleet', element: <RequireModule anyOf={['fleet']}><FleetPage /></RequireModule> },
       { path: 'fleet/:id', element: <RequireModule anyOf={['fleet']}><AssetEditor /></RequireModule> },
+      { path: 'tenants', element: <RequireModule anyOf={['tenants']}><TenantsPage /></RequireModule> },
       { path: 'reports', element: <RequireModule anyOf={['reports']}><ReportsPage /></RequireModule> },
       { path: 'people', element: <RequireModule anyOf={['hr', 'safety']}><PeoplePage /></RequireModule> },
       { path: 'owner', element: <RequireModule anyOf={['owner']}><OwnerPage /></RequireModule> },

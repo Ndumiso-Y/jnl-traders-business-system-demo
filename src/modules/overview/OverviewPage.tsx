@@ -39,6 +39,7 @@ export default function OverviewPage() {
       case 'Procurement': return <IcoBag />;
       case 'Fleet': case 'Equipment': return <IcoTruck />;
       case 'Safety': return <IcoFlag />;
+      case 'Tenants': return <IcoUsers />;
       case 'HR': return <IcoUsers />;
       default: return <IcoDoc />;
     }

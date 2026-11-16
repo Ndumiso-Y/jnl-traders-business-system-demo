@@ -13,7 +13,7 @@ export default function SettingsPage() {
   const update = useStore((s) => s.updateSettings);
   const resetDemo = useStore((s) => s.resetDemo);
   const toast = useStore((s) => s.toast);
-  const counts = useStore(useShallow((s) => ({ quotations: s.quotations.length, invoices: s.invoices.length, payments: s.payments.length, requests: s.requests.length, assets: s.assets.length, expenses: s.expenses.length, hr: s.hrRecords.length, incidents: s.incidents.length })));
+  const counts = useStore(useShallow((s) => ({ quotations: s.quotations.length, invoices: s.invoices.length, payments: s.payments.length, requests: s.requests.length, assets: s.assets.length, expenses: s.expenses.length, hr: s.hrRecords.length, incidents: s.incidents.length, properties: s.properties.length, tenants: s.tenants.length })));
   const [vat, setVat] = useState(String(settings.vatRate));
   const [company, setCompany] = useState(settings.companyName);
   const [err, setErr] = useState('');

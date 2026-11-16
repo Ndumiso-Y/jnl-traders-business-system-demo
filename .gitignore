@@ -29,3 +29,6 @@ internal/
 # tool state
 *.tsbuildinfo
 .claude/
+
+# internal marketing material
+Promotion/

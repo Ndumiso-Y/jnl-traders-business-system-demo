@@ -16,6 +16,7 @@ future system. It is separate from the existing two-website engagement and carri
 | Users & permissions | Eight fictional users with module-scoped access, as requested in the 14 October meeting: the Super Admin sees everything and grants or revokes each user's modules (Overview, Finance, Procurement, PPE, Fleet, Reports, HR, Safety, Owner view, Users & permissions) plus approval and finance-review rights; Finance sees finance, HR sees HR, Fleet sees fleet; hidden modules disappear from navigation and direct links show a "No access" page; nobody except an owner or super admin may approve their own request; add/remove demo users; changes persist in the browser and older saved data migrates automatically |
 | Fleet & equipment | Vehicle and equipment register; make / model / registration / year / status / assignment / odometer; service, licence, insurance, inspection dates with due-soon (30 days) and overdue states computed from today; search and filters; add / edit / delete |
 | Reports | Date-range monthly aggregates of invoices issued, payments received and recorded costs (kept separate, never labelled profit); cost register with categories and asset links |
+| Properties & tenants (added 16 Nov 2026 at the owner's request: the client also owns properties with tenants) | Fictional property register with units and occupancy; tenants with lease start/end, rent and deposit; lease-ending flags (60 days); monthly rent ledger that charges rent per month from the lease start, records payments, shows balance and months in arrears; rent statement PDF; rent roll and arrears on the Owner view; gated by the Properties & tenants module (Super Admin, Owner and a Property Manager user hold it by default) |
 | HR & safety | Representative hiring and disciplinary records (codes only) and a safety incident register with follow-up dates |
 | Owner view | Six-month summary, approvals waiting, top customers, operational flags |
 | Workspace | Live search across all records; persistence in `localStorage`; reset with warning; empty states; keyboard focus; responsive 1440 / 1024 / 768 / 390 px |
@@ -26,6 +27,7 @@ future system. It is separate from the existing two-website engagement and carri
 - **Persistence.** Records live in the visitor's browser only. A second browser, device or private window starts from the seed. Nothing syncs and nothing is backed up.
 - **Documents.** PDFs are watermarked "DEMONSTRATION / NOT A VALID TAX INVOICE". Numbering (`Q-D…`, `INV-D…`, `REQ-D…`, `PO-D…`) is a demo scheme. VAT at 15% is a configurable demonstration default and says nothing about JNL's VAT registration or compliance.
 - **Payments and statements.** Fictional entries typed into the demo. No bank, email or accounting integration.
+- **Rent ledger.** Charges one full month of rent per month from the lease start, with no pro-rata, escalation, utilities, interest or legal notices. These rules are placeholders for discovery, not a lease standard.
 - **Activity feed and notifications.** The bell icon is decorative; the feed is a local log.
 
 ## Future, separately approved work (not built)
@@ -54,3 +56,4 @@ statement templates and numbering; VAT treatment; real roles, approvers and limi
 8. How many users and sites; office-only or mobile use in the field?
 9. Hosting preference (cloud vs on-premise), backup expectations and support hours.
 10. Budget range and timing for a production phase.
+11. Properties: how many properties and units, residential or commercial, how rent is invoiced today (monthly invoice, debit order, pro-rata), escalations, deposits, utilities recovery, and what tenant communication (statements, reminders, notices) is needed.

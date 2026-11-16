@@ -275,7 +275,7 @@ test.describe('Fleet, reports, persistence and reset', () => {
 });
 
 test.describe('Responsive viewports', () => {
-  const pages: Array<[string, string]> = [['overview', '#/'], ['finance-quotation', '#/finance/quotations/quo_101'], ['fleet', '#/fleet'], ['procurement', '#/procurement'], ['reports', '#/reports'], ['admin', '#/admin']];
+  const pages: Array<[string, string]> = [['overview', '#/'], ['finance-quotation', '#/finance/quotations/quo_101'], ['fleet', '#/fleet'], ['procurement', '#/procurement'], ['reports', '#/reports'], ['tenants', '#/tenants'], ['admin', '#/admin']];
   for (const [w, h, name] of [[1440, 900, 'desktop-1440'], [1024, 768, 'desktop-1024'], [768, 1024, 'tablet-768'], [390, 844, 'mobile-390']] as Array<[number, number, string]>) {
     test(`${name}: no horizontal overflow, screenshots captured`, async ({ page }) => {
       await page.setViewportSize({ width: w, height: h });

@@ -3,8 +3,8 @@
 // JNL Traders customers, staff, vehicles, suppliers or finances.
 // Dates are generated relative to "today" so due/overdue states are visible.
 // ---------------------------------------------------------------------------
-import type { DataState, DemoUser, Role } from './types';
-import { addDays, todayIso, toIso } from '../lib/dates';
+import type { DataState, DemoUser, Property, RentPayment, Role, Tenant, Unit } from './types';
+import { addDays, parseIso, todayIso, toIso } from '../lib/dates';
 
 const uid = (() => {
   let n = 1000;
@@ -25,7 +25,7 @@ function monthStart(offset: number): string {
   return toIso(d);
 }
 
-const ALL: DemoUser['modules'] = ['overview', 'finance', 'procurement', 'ppe', 'fleet', 'reports', 'hr', 'safety', 'owner', 'admin'];
+const ALL: DemoUser['modules'] = ['overview', 'finance', 'procurement', 'ppe', 'fleet', 'tenants', 'reports', 'hr', 'safety', 'owner', 'admin'];
 
 /** Fictional demo users with module-scoped access (simulated). */
 export function seedUsers(): DemoUser[] {
@@ -35,10 +35,69 @@ export function seedUsers(): DemoUser[] {
     { id: 'u_supervisor', name: 'Demo Supervisor', title: 'Operations manager', role: 'manager', modules: ['overview', 'procurement', 'ppe', 'fleet', 'reports', 'safety'], canApprove: true, canReviewFinance: false, isSuperAdmin: false },
     { id: 'u_finance', name: 'Demo Finance Clerk', title: 'Finance', role: 'finance', modules: ['overview', 'finance', 'procurement', 'ppe', 'reports'], canApprove: false, canReviewFinance: true, isSuperAdmin: false },
     { id: 'u_procurement', name: 'Demo Procurement Officer', title: 'Procurement', role: 'finance', modules: ['overview', 'procurement', 'ppe'], canApprove: false, canReviewFinance: true, isSuperAdmin: false },
+    { id: 'u_property', name: 'Demo Property Manager', title: 'Properties & tenants', role: 'manager', modules: ['overview', 'tenants', 'reports'], canApprove: false, canReviewFinance: false, isSuperAdmin: false },
     { id: 'u_hr', name: 'Demo HR Officer', title: 'Human resources', role: 'manager', modules: ['overview', 'hr', 'safety'], canApprove: false, canReviewFinance: false, isSuperAdmin: false },
     { id: 'u_fleet', name: 'Demo Fleet Controller', title: 'Fleet & equipment', role: 'requester', modules: ['overview', 'fleet', 'procurement', 'safety'], canApprove: false, canReviewFinance: false, isSuperAdmin: false },
     { id: 'u_requester', name: 'Demo Requester', title: 'Workshop employee', role: 'requester', modules: ['overview', 'procurement', 'ppe', 'safety'], canApprove: false, canReviewFinance: false, isSuperAdmin: false },
   ];
+}
+
+/** Fictional properties, units, tenants and rent payments. */
+export function seedProperties(today = todayIso()): { properties: Property[]; units: Unit[]; tenants: Tenant[]; rentPayments: RentPayment[] } {
+  const created = new Date().toISOString();
+  const properties: Property[] = [
+    { id: 'prp_1', ref: 'PRP-D001', name: 'Demo Workshop Park', address: '14 Sample Industrial Road, Demo Park (fictional)', type: 'industrial', notes: 'Four workshop bays let to fictional trade tenants.', createdAt: created },
+    { id: 'prp_2', ref: 'PRP-D002', name: 'Demo Main Street Shops', address: '2 Fictional Avenue, Testville (fictional)', type: 'commercial', notes: 'Three retail units with shared parking.', createdAt: created },
+    { id: 'prp_3', ref: 'PRP-D003', name: 'Demo Residential Flats', address: '7 Mock Street, Demo City (fictional)', type: 'residential', notes: 'Six flats; fictional tenants identified by code.', createdAt: created },
+  ];
+  const units: Unit[] = [
+    { id: 'unit_1', propertyId: 'prp_1', ref: 'Bay 1', description: 'Workshop bay 120 m²', rent: 9500, status: 'occupied', notes: '' },
+    { id: 'unit_2', propertyId: 'prp_1', ref: 'Bay 2', description: 'Workshop bay 120 m²', rent: 9500, status: 'occupied', notes: '' },
+    { id: 'unit_3', propertyId: 'prp_1', ref: 'Bay 3', description: 'Workshop bay 90 m²', rent: 7800, status: 'vacant', notes: 'Available from next month.' },
+    { id: 'unit_4', propertyId: 'prp_1', ref: 'Bay 4', description: 'Workshop bay 90 m² + office', rent: 8900, status: 'occupied', notes: '' },
+    { id: 'unit_5', propertyId: 'prp_2', ref: 'Shop A', description: 'Retail 60 m²', rent: 12500, status: 'occupied', notes: '' },
+    { id: 'unit_6', propertyId: 'prp_2', ref: 'Shop B', description: 'Retail 45 m²', rent: 9800, status: 'occupied', notes: '' },
+    { id: 'unit_7', propertyId: 'prp_2', ref: 'Shop C', description: 'Retail 45 m²', rent: 9800, status: 'maintenance', notes: 'Fictional refit in progress.' },
+    { id: 'unit_8', propertyId: 'prp_3', ref: 'Flat 1', description: '2-bed flat', rent: 6500, status: 'occupied', notes: '' },
+    { id: 'unit_9', propertyId: 'prp_3', ref: 'Flat 2', description: '2-bed flat', rent: 6500, status: 'occupied', notes: '' },
+    { id: 'unit_10', propertyId: 'prp_3', ref: 'Flat 3', description: '1-bed flat', rent: 5200, status: 'occupied', notes: '' },
+    { id: 'unit_11', propertyId: 'prp_3', ref: 'Flat 4', description: '1-bed flat', rent: 5200, status: 'vacant', notes: '' },
+    { id: 'unit_12', propertyId: 'prp_3', ref: 'Flat 5', description: '2-bed flat', rent: 6500, status: 'occupied', notes: '' },
+    { id: 'unit_13', propertyId: 'prp_3', ref: 'Flat 6', description: 'Bachelor', rent: 4200, status: 'occupied', notes: '' },
+  ];
+  const t = (id: string, n: number, name: string, unitId: string, startMonthsAgo: number, termMonths: number, status: Tenant['status'], notes = ''): Tenant => {
+    const u = units.find((x) => x.id === unitId)!;
+    const start = (() => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - startMonthsAgo); return toIso(d); })();
+    const end = (() => { const d = parseIso(start); d.setMonth(d.getMonth() + termMonths); d.setDate(d.getDate() - 1); return toIso(d); })();
+    return { id, ref: `TEN-D${String(n).padStart(3, '0')}`, name, contact: 'Fictional contact', phone: '000 000 0000', email: `${id}@example.com`, propertyId: u.propertyId, unitId, unitRef: u.ref, leaseStart: start, leaseEnd: end, rent: u.rent, deposit: u.rent, status, notes, createdAt: created, updatedAt: created };
+  };
+  const tenants: Tenant[] = [
+    t('ten_1', 1, 'Sample Panelbeaters CC', 'unit_1', 9, 12, 'active'),
+    t('ten_2', 2, 'Demo Tyre Fitment', 'unit_2', 5, 12, 'active'),
+    t('ten_3', 3, 'Placeholder Welding Works', 'unit_4', 11, 12, 'active', 'Lease ends soon — renewal discussion (fictional).'),
+    t('ten_4', 4, 'Example Hair Studio', 'unit_5', 7, 24, 'active'),
+    t('ten_5', 5, 'Demo Cellular Repairs', 'unit_6', 3, 12, 'active'),
+    t('ten_6', 6, 'Tenant T-0101', 'unit_8', 6, 12, 'active'),
+    t('ten_7', 7, 'Tenant T-0102', 'unit_9', 2, 12, 'active'),
+    t('ten_8', 8, 'Tenant T-0103', 'unit_10', 4, 12, 'notice', 'Gave notice; moving out at month end (fictional).'),
+    t('ten_9', 9, 'Tenant T-0104', 'unit_12', 8, 12, 'active'),
+    t('ten_10', 10, 'Tenant T-0105', 'unit_13', 1, 6, 'active'),
+  ];
+  // Payments: most tenants paid every month; two are in arrears.
+  const rentPayments: RentPayment[] = [];
+  let n = 1;
+  for (const ten of tenants) {
+    const months = ((): string[] => { const out: string[] = []; const d = parseIso(ten.leaseStart); while (toIso(d) <= today) { out.push(toIso(d).slice(0, 7)); d.setMonth(d.getMonth() + 1); } return out; })();
+    const skip = ten.id === 'ten_3' ? 2 : ten.id === 'ten_7' ? 1 : 0; // months unpaid (fictional arrears)
+    rentPayments.push({ id: `rp_${n++}`, tenantId: ten.id, date: ten.leaseStart, amount: ten.deposit, method: 'eft', reference: 'DEMO-DEPOSIT', createdAt: created });
+    months.forEach((m, i) => {
+      if (i >= months.length - skip) return;
+      const payDate = `${m}-0${1 + (i % 5)}`;
+      if (payDate > today) return;
+      rentPayments.push({ id: `rp_${n++}`, tenantId: ten.id, date: payDate, amount: ten.rent, method: i % 3 === 0 ? 'debit-order' : 'eft', reference: `DEMO-RENT-${m}`, createdAt: created });
+    });
+  }
+  return { properties, units, tenants, rentPayments };
 }
 
 export function buildSeed(): DataState {
@@ -258,7 +317,8 @@ export function buildSeed(): DataState {
     seededAt: new Date().toISOString(),
     settings: { vatRate: 15, role: 'manager', companyName: 'JNL Traders', showDemoBanner: true, currentUserId: 'u_supervisor' },
     users: seedUsers(),
-    counters: { quotation: 104, invoice: 210, request: 39, po: 14, asset: 11, hr: 6, incident: 4 },
+    counters: { quotation: 104, invoice: 210, request: 39, po: 14, asset: 11, hr: 6, incident: 4, property: 4, tenant: 11 },
+    ...seedProperties(today),
     customers,
     quotations,
     invoices,
