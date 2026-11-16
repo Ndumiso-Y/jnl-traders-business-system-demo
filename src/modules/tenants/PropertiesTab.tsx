@@ -40,7 +40,7 @@ export default function PropertiesTab({ editing, setEditing, onOpenLedger }: { e
 
   return (
     <>
-      <div style={{ display: 'grid', gap: 18, marginBottom: 18 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', gap: 18, marginBottom: 18 }}>
         <Panel title="Properties" meta="Fictional portfolio">
           <ul className="list" data-testid="property-list">
             {store.properties.map((p) => {
