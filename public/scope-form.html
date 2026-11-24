@@ -272,6 +272,8 @@
     form.addEventListener('change', update);
     update();
     form.addEventListener('submit', function () {
+      // Leave unanswered boxes out of the email so only real answers arrive.
+      Array.prototype.forEach.call(form.querySelectorAll('input[type=text], input[type=date], textarea'), function (i) { if (!i.value.trim()) i.disabled = true; });
       var btn = document.getElementById('send');
       btn.disabled = true; btn.textContent = 'Sending…';
     });
