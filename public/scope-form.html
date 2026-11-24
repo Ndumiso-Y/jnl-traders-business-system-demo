@@ -4,191 +4,146 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="robots" content="noindex" />
-<title>JNL Traders · Business system scope form</title>
+<title>JNL Traders · Scope checklist</title>
 <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
-  :root { --bg:#f7f7f4; --panel:#fff; --ink:#212521; --ink2:#2d342d; --muted:#6e756f; --muted2:#8c918a; --gold:#b49358; --gold-text:#967647; --gold-tint:#f0eadd; --gold-line:#e4d6be; --line:#e9e8e4; --line2:#eff0ec; --ok:#3f9260; --danger:#ae6460; --dark:#242924; }
+  :root { --bg:#f7f7f4; --ink:#212521; --ink2:#2d342d; --muted:#6e756f; --muted2:#8c918a; --gold:#b49358; --gold-tint:#f0eadd; --gold-line:#e4d6be; --line:#e9e8e4; --line2:#eff0ec; --ok:#3f9260; --danger:#ae6460; --dark:#242924; }
   * { box-sizing:border-box; }
   html { background:var(--bg); }
-  body { margin:0; font-family:Inter,"Segoe UI",system-ui,sans-serif; font-size:15px; line-height:1.5; color:var(--ink); -webkit-font-smoothing:antialiased; }
-  .wrap { max-width:760px; margin:0 auto; padding:28px 16px 80px; }
-  .brand { display:flex; align-items:baseline; gap:8px; margin-bottom:22px; }
-  .brand b { font-size:30px; font-weight:800; letter-spacing:-2px; color:#222723; }
+  body { margin:0; font-family:Inter,"Segoe UI",system-ui,sans-serif; font-size:16px; line-height:1.5; color:var(--ink); -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:680px; margin:0 auto; padding:24px 16px 72px; }
+  .brand { display:flex; align-items:baseline; gap:8px; margin-bottom:18px; }
+  .brand b { font-size:28px; font-weight:800; letter-spacing:-2px; color:#222723; }
   .brand b span { color:var(--gold); }
   .brand small { font-size:10px; letter-spacing:3px; font-weight:700; color:var(--gold); }
-  .kicker { letter-spacing:2px; font-size:11px; font-weight:800; color:#b28f54; text-transform:uppercase; margin-bottom:8px; }
-  h1 { font-size:30px; letter-spacing:-1.2px; margin:0 0 8px; line-height:1.15; }
-  .lead { color:var(--muted2); margin:0 0 22px; font-size:15px; }
-  .panel { background:var(--panel); border:1px solid #e9eae5; border-radius:16px; padding:22px; margin-bottom:16px; box-shadow:0 9px 20px rgba(50,55,44,.03); }
-  .panel h2 { font-size:17px; letter-spacing:-.3px; margin:0 0 4px; }
-  .panel .meta { font-size:12px; color:#9a9e99; margin:0 0 16px; }
-  .q { padding:14px 0; border-top:1px solid var(--line2); }
-  .q:first-of-type { border-top:0; padding-top:4px; }
-  .q label.t, .q .t { display:block; font-weight:600; font-size:14px; color:var(--ink2); margin-bottom:8px; }
-  .q .h { display:block; font-size:12px; color:var(--muted2); margin:-4px 0 8px; }
-  .opts { display:flex; flex-wrap:wrap; gap:8px; }
-  .opts label { display:inline-flex; align-items:center; gap:7px; border:1px solid #dedfd8; border-radius:100px; padding:9px 14px; font-size:13px; font-weight:600; color:#4c564d; background:#fff; cursor:pointer; }
-  .opts label:has(input:checked) { background:var(--dark); border-color:var(--dark); color:#fff; }
-  .opts input { accent-color:var(--gold); margin:0; }
-  input[type=text], input[type=email], input[type=tel], textarea, select { width:100%; border:1px solid #e3e4de; border-radius:10px; background:#fff; padding:11px 13px; font:inherit; font-size:14px; color:var(--ink); }
-  textarea { min-height:70px; resize:vertical; }
-  input:focus, textarea:focus, select:focus { outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(180,147,88,.14); }
-  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-  @media (max-width:560px) { .grid2 { grid-template-columns:1fr; } h1 { font-size:26px; } .panel { padding:18px; } }
-  .file { border:1px dashed #d9d8d1; border-radius:10px; padding:12px; background:#fbfbf9; font-size:13px; color:var(--muted); }
-  .file input { display:block; margin-top:8px; font-size:13px; }
-  .note { background:var(--gold-tint); border:1px solid var(--gold-line); color:#7a5f33; border-radius:12px; padding:12px 14px; font-size:13px; }
-  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; border:1px solid #262c26; background:#262c26; color:#fff; border-radius:10px; height:48px; padding:0 22px; font-weight:700; font-size:15px; cursor:pointer; width:100%; }
-  .btn:disabled { opacity:.6; cursor:wait; }
-  .progress { position:sticky; top:0; z-index:5; background:rgba(247,247,244,.92); backdrop-filter:blur(6px); padding:10px 0 8px; margin-bottom:10px; }
+  .brand .by { margin-left:auto; color:#a4a8a4; letter-spacing:1px; font-size:10px; font-weight:700; }
+  h1 { font-size:28px; letter-spacing:-1.1px; margin:0 0 6px; line-height:1.15; }
+  .lead { color:var(--muted2); margin:0 0 18px; font-size:15px; }
+  .progress { position:sticky; top:0; z-index:5; background:rgba(247,247,244,.94); backdrop-filter:blur(6px); padding:10px 0 8px; margin-bottom:8px; }
   .progress .bar { height:5px; background:var(--line); border-radius:4px; overflow:hidden; }
   .progress .bar i { display:block; height:100%; width:0; background:var(--gold); transition:width .3s; }
-  .progress small { display:block; font-size:11px; color:var(--muted2); margin-top:6px; }
-  .req { color:var(--danger); }
-  .err { color:var(--danger); font-size:12px; font-weight:600; margin-top:6px; display:none; }
+  .progress small { display:block; font-size:12px; color:var(--muted2); margin-top:6px; }
+  section { background:#fff; border:1px solid #e9eae5; border-radius:16px; padding:20px 20px 8px; margin:0 0 14px; box-shadow:0 9px 20px rgba(50,55,44,.03); }
+  section > h2 { display:flex; align-items:center; gap:10px; font-size:18px; letter-spacing:-.3px; margin:0 0 4px; }
+  section > h2 .n { width:28px; height:28px; border-radius:50%; background:var(--dark); color:#e9c77a; font-size:13px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; flex:none; }
+  section > .meta { font-size:13px; color:#9a9e99; margin:0 0 6px; }
+  .q { padding:16px 0; border-top:1px solid var(--line2); }
+  .q:first-of-type { border-top:0; }
+  .q .t { display:block; font-weight:600; font-size:15.5px; color:var(--ink2); margin-bottom:10px; }
+  .opts { display:flex; flex-wrap:wrap; gap:8px; }
+  .opts label { display:inline-flex; align-items:center; gap:7px; border:1px solid #dedfd8; border-radius:100px; padding:11px 16px; font-size:14px; font-weight:600; color:#4c564d; background:#fff; cursor:pointer; user-select:none; }
+  .opts label:has(input:checked) { background:var(--dark); border-color:var(--dark); color:#fff; }
+  .opts input { width:14px; height:14px; accent-color:var(--gold); margin:0; }
+  .opts label:has(input:checked) input { accent-color:#e9c77a; }
+  input[type=text], textarea { width:100%; border:1px solid #e3e4de; border-radius:10px; background:#fff; padding:12px 14px; font:inherit; font-size:15px; color:var(--ink); }
+  textarea { min-height:80px; resize:vertical; }
+  input:focus, textarea:focus { outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(180,147,88,.14); }
+  .check { display:grid; gap:10px; }
+  .check .row { display:grid; grid-template-columns:1fr; gap:8px; padding:14px; border:1px solid var(--line); border-radius:12px; background:#fbfbf9; }
+  .check .row b { font-size:15px; font-weight:600; color:var(--ink2); }
+  .check .row small { color:var(--muted2); font-size:13px; }
+  .note { background:var(--gold-tint); border:1px solid var(--gold-line); color:#7a5f33; border-radius:12px; padding:12px 14px; font-size:13.5px; margin:0 0 12px; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; border:1px solid #262c26; background:#262c26; color:#fff; border-radius:12px; height:52px; padding:0 22px; font-weight:700; font-size:16px; cursor:pointer; width:100%; }
+  .btn:disabled { opacity:.6; cursor:wait; }
   .thanks { text-align:center; padding:40px 16px; }
   .thanks .tick { width:64px; height:64px; border-radius:50%; background:#edf7ef; color:var(--ok); display:inline-flex; align-items:center; justify-content:center; font-size:30px; margin-bottom:14px; }
-  .foot { font-size:11px; color:#a1a59f; margin-top:22px; text-align:center; letter-spacing:.3px; }
+  .foot { font-size:11px; color:#a1a59f; margin-top:20px; text-align:center; letter-spacing:.3px; }
   .hidden { display:none !important; }
+  @media (max-width:480px) { h1 { font-size:25px; } section { padding:16px 16px 6px; } .opts label { padding:11px 14px; } }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="brand"><b>JNL<span>.</span></b><small>TRADERS</small><small style="color:#a4a8a4;letter-spacing:1px;margin-left:auto">PREPARED BY EMBARK DIGITALS</small></div>
+  <div class="brand"><b>JNL<span>.</span></b><small>TRADERS</small><span class="by">EMBARK DIGITALS</span></div>
 
-  <div id="thanks" class="panel thanks hidden">
-    <div class="tick">✓</div>
+  <div id="thanks" class="thanks hidden">
+    <section><div class="tick">✓</div>
     <h1>Thank you, it's on its way.</h1>
-    <p class="lead">Your answers have been sent to Ndumiso at Embark Digitals. He will come back to you with a phased plan and a scope call date.<br>You can close this page.</p>
+    <p class="lead">Ndumiso will come back to you with the phased plan and a date for the scope call. You can close this page.</p></section>
   </div>
 
   <div id="formwrap">
-    <div class="kicker">Business system · scope questions</div>
-    <h1>Help us build it the way JNL works.</h1>
-    <p class="lead">About 10 minutes. Tap an answer and type where you want to add a word. If you don't have something, just say so, nothing here is a test. Documents can follow on WhatsApp afterwards. Press <b>Send to Embark</b> at the end.</p>
+    <h1>Business system: quick checklist</h1>
+    <p class="lead">Tap your answers. Nothing to type unless you want to. About five minutes.</p>
 
-    <div class="progress"><div class="bar"><i id="pbar"></i></div><small id="ptext">0 of 28 answered</small></div>
+    <div class="progress"><div class="bar"><i id="pbar"></i></div><small id="ptext"></small></div>
 
     <form id="f" method="POST" action="https://api.web3forms.com/submit" novalidate>
       <input type="hidden" name="access_key" id="access_key" value="93703833-c8cf-4991-972c-5e5a07fdbb9b" />
-      <input type="hidden" name="subject" value="JNL Traders - business system scope form" />
-      <input type="hidden" name="from_name" value="JNL Traders scope form" />
+      <input type="hidden" name="subject" value="JNL Traders - scope checklist" />
+      <input type="hidden" name="from_name" value="JNL Traders scope checklist" />
       <input type="hidden" name="redirect" value="https://ndumiso-y.github.io/jnl-traders-business-system-demo/scope-form.html?sent=1" />
       <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" />
 
-      <div class="panel">
-        <h2>1 · Who is filling this in</h2>
-        <p class="meta">So we know who to reply to.</p>
-        <div class="grid2">
-          <div class="q"><label class="t" for="name">Your name <span class="req">*</span></label><input id="name" type="text" name="Name" required /></div>
-          <div class="q"><label class="t" for="email">Email <span class="req">*</span></label><input id="email" type="email" name="email" required /></div>
-          <div class="q"><label class="t" for="phone">WhatsApp / phone</label><input id="phone" type="tel" name="Phone" /></div>
-          <div class="q"><label class="t" for="company">Company</label><input id="company" type="text" name="Company" value="JNL Traders" /></div>
+      <section>
+        <h2><span class="n">1</span>Documents to send us</h2>
+        <p class="meta">Tap one for each. Send the files afterwards on WhatsApp or email, masked copies are fine.</p>
+        <div class="check">
+          <div class="row"><b>Quotation and invoice templates</b><small>Plus one real example of each</small>
+            <div class="opts"><label><input type="radio" name="Quotation and invoice templates" value="Have it" />Have it</label><label><input type="radio" name="Quotation and invoice templates" value="Need to find" />Need to find</label><label><input type="radio" name="Quotation and invoice templates" value="Don't have" />Don't have</label></div></div>
+          <div class="row"><b>Payroll examples from your accountant</b><small>Payslip layout and about three months of worked examples</small>
+            <div class="opts"><label><input type="radio" name="Payroll examples" value="Have it" />Have it</label><label><input type="radio" name="Payroll examples" value="Need to find" />Need to find</label><label><input type="radio" name="Payroll examples" value="Ask accountant directly" />Ask my accountant</label></div>
+            <input type="text" name="Accountant name and number" placeholder="Accountant's name and number (optional)" /></div>
+          <div class="row"><b>Safety and disciplinary forms</b><small>Incident report form, safety procedure, disciplinary steps</small>
+            <div class="opts"><label><input type="radio" name="Safety and disciplinary forms" value="Have it" />Have it</label><label><input type="radio" name="Safety and disciplinary forms" value="Need to find" />Need to find</label><label><input type="radio" name="Safety and disciplinary forms" value="Nothing formal" />Nothing formal</label></div></div>
+          <div class="row"><b>Fleet, insurance and asset records</b><small>Whatever you use today: spreadsheet, book, insurance schedule</small>
+            <div class="opts"><label><input type="radio" name="Fleet insurance asset records" value="Have it" />Have it</label><label><input type="radio" name="Fleet insurance asset records" value="Need to find" />Need to find</label><label><input type="radio" name="Fleet insurance asset records" value="On paper / in my head" />On paper</label></div></div>
+          <div class="row"><b>PPE list</b><small>What is issued, to whom</small>
+            <div class="opts"><label><input type="radio" name="PPE list" value="Have it" />Have it</label><label><input type="radio" name="PPE list" value="Need to find" />Need to find</label><label><input type="radio" name="PPE list" value="Nothing written" />Nothing written</label></div></div>
+          <div class="row"><b>Tenant and property records</b><small>Leases, rent records, whatever you keep</small>
+            <div class="opts"><label><input type="radio" name="Tenant and property records" value="Have it" />Have it</label><label><input type="radio" name="Tenant and property records" value="Need to find" />Need to find</label><label><input type="radio" name="Tenant and property records" value="Nothing written" />Nothing written</label></div></div>
         </div>
-      </div>
+        <div style="height:12px"></div>
+      </section>
 
-      <div class="panel">
-        <h2>2 · Documents</h2>
-        <p class="meta">For each one, tell us whether you have it. Send the actual files on WhatsApp or email after you submit, we will remind you which ones. Please remove account numbers, salaries and personal details first.</p>
-
-        <div class="q"><span class="t">Quotation and invoice templates (plus one real example of each)</span>
-          <div class="opts"><label><input type="radio" name="Doc 1 - Quotation and invoice templates" value="Have it, will send" />Have it, will send</label><label><input type="radio" name="Doc 1 - Quotation and invoice templates" value="Need to find it" />Need to find it</label><label><input type="radio" name="Doc 1 - Quotation and invoice templates" value="Don't have a template" />We don't use a template</label></div></div>
-
-        <div class="q"><span class="t">Accountant's payroll requirements: payslip layout, earnings and deductions used, and about three months of worked examples</span>
-          <div class="opts"><label><input type="radio" name="Doc 2 - Payroll and accountant" value="Have it, will send" />Have it, will send</label><label><input type="radio" name="Doc 2 - Payroll and accountant" value="Need to find it" />Need to find it</label><label><input type="radio" name="Doc 2 - Payroll and accountant" value="Ask my accountant directly" />Ask my accountant directly</label></div>
-          <span class="h">Accountant's name and contact, if we may speak to them directly</span><input type="text" name="Accountant contact" /></div>
-
-        <div class="q"><span class="t">Safety procedures, incident report form and disciplinary process</span>
-          <div class="opts"><label><input type="radio" name="Doc 3 - Safety and disciplinary" value="Have it, will send" />Have it, will send</label><label><input type="radio" name="Doc 3 - Safety and disciplinary" value="Need to find it" />Need to find it</label><label><input type="radio" name="Doc 3 - Safety and disciplinary" value="Nothing formal yet" />Nothing formal yet</label></div></div>
-
-        <div class="q"><span class="t">Fleet, insurance and asset records (spreadsheets or forms you use now, and your insurance schedule)</span>
-          <div class="opts"><label><input type="radio" name="Doc 4 - Fleet insurance assets" value="Have it, will send" />Have it, will send</label><label><input type="radio" name="Doc 4 - Fleet insurance assets" value="Need to find it" />Need to find it</label><label><input type="radio" name="Doc 4 - Fleet insurance assets" value="Kept in my head / on paper" />Kept on paper or in my head</label></div></div>
-
-        <div class="q"><span class="t">PPE list and any stock or stocktake procedure</span>
-          <div class="opts"><label><input type="radio" name="Doc 5 - PPE and stock" value="Have it, will send" />Have it, will send</label><label><input type="radio" name="Doc 5 - PPE and stock" value="Need to find it" />Need to find it</label><label><input type="radio" name="Doc 5 - PPE and stock" value="No written procedure" />No written procedure</label></div></div>
-
-        <div class="q"><span class="t">Tenant and property records format</span>
-          <div class="opts"><label><input type="radio" name="Doc 6 - Tenant records" value="Have it, will send" />Have it, will send</label><label><input type="radio" name="Doc 6 - Tenant records" value="Need to find it" />Need to find it</label><label><input type="radio" name="Doc 6 - Tenant records" value="Nothing written down" />Nothing written down</label></div></div>
-      </div>
-
-      <div class="panel">
-        <h2>3 · Finance</h2>
-        <p class="meta">Invoices, VAT and payroll.</p>
+      <section>
+        <h2><span class="n">2</span>Quick decisions</h2>
+        <p class="meta">One tap each. "You decide" is a fine answer.</p>
         <div class="q"><span class="t">Is JNL Traders VAT registered?</span>
-          <div class="opts"><label><input type="radio" name="VAT registered" value="Yes" />Yes</label><label><input type="radio" name="VAT registered" value="No" />No</label><label><input type="radio" name="VAT registered" value="Not sure" />Not sure</label></div>
-          <span class="h">VAT number, if yes</span><input type="text" name="VAT number" /></div>
-        <div class="q"><span class="t">Invoice numbering: keep your current numbering or start a fresh series?</span>
-          <div class="opts"><label><input type="radio" name="Invoice numbering" value="Keep current numbering" />Keep current</label><label><input type="radio" name="Invoice numbering" value="Start fresh" />Start fresh</label><label><input type="radio" name="Invoice numbering" value="You decide" />You decide</label></div>
-          <span class="h">What does your current invoice number look like? (e.g. INV-2026-0147)</span><input type="text" name="Current invoice number example" /></div>
-        <div class="q"><span class="t">Payroll: connect to a certified payroll service, or build the calculations with your accountant's sign-off?</span>
-          <div class="opts"><label><input type="radio" name="Payroll approach" value="Certified payroll service" />Payroll service</label><label><input type="radio" name="Payroll approach" value="Build with accountant sign-off" />Build it in</label><label><input type="radio" name="Payroll approach" value="Recommend for me" />Recommend for me</label></div></div>
-        <div class="q"><span class="t">How many employees are on payroll?</span>
-          <div class="opts"><label><input type="radio" name="Employees on payroll" value="1-10" />1–10</label><label><input type="radio" name="Employees on payroll" value="11-25" />11–25</label><label><input type="radio" name="Employees on payroll" value="26-50" />26–50</label><label><input type="radio" name="Employees on payroll" value="50+" />50+</label></div></div>
-        <div class="q"><span class="t">Which reports do you need to export?</span>
-          <div class="opts"><label><input type="checkbox" name="Report formats" value="PDF" />PDF</label><label><input type="checkbox" name="Report formats" value="Excel" />Excel</label><label><input type="checkbox" name="Report formats" value="PowerPoint later" />PowerPoint later</label></div></div>
-      </div>
-
-      <div class="panel">
-        <h2>4 · Reminders, PPE and stock</h2>
-        <div class="q"><span class="t">How should reminders reach people? (renewals, PPE issues, approvals)</span>
-          <div class="opts"><label><input type="checkbox" name="Reminder channels" value="WhatsApp" />WhatsApp</label><label><input type="checkbox" name="Reminder channels" value="SMS" />SMS</label><label><input type="checkbox" name="Reminder channels" value="Email" />Email</label><label><input type="checkbox" name="Reminder channels" value="Inside the system" />Inside the system</label></div>
-          <span class="h">Who should get them? (names or roles)</span><input type="text" name="Reminder recipients" /></div>
+          <div class="opts"><label><input type="radio" name="VAT registered" value="Yes" />Yes</label><label><input type="radio" name="VAT registered" value="No" />No</label><label><input type="radio" name="VAT registered" value="Not sure" />Not sure</label></div></div>
+        <div class="q"><span class="t">Invoice numbers: keep your current series or start fresh?</span>
+          <div class="opts"><label><input type="radio" name="Invoice numbering" value="Keep current" />Keep current</label><label><input type="radio" name="Invoice numbering" value="Start fresh" />Start fresh</label><label><input type="radio" name="Invoice numbering" value="You decide" />You decide</label></div></div>
+        <div class="q"><span class="t">Payroll: use a certified payroll service, or build it in with your accountant's sign-off?</span>
+          <div class="opts"><label><input type="radio" name="Payroll approach" value="Payroll service" />Payroll service</label><label><input type="radio" name="Payroll approach" value="Build it in" />Build it in</label><label><input type="radio" name="Payroll approach" value="You decide" />You decide</label></div></div>
+        <div class="q"><span class="t">How should reminders reach people? (renewals, PPE, approvals)</span>
+          <div class="opts"><label><input type="checkbox" name="Reminders" value="WhatsApp" />WhatsApp</label><label><input type="checkbox" name="Reminders" value="SMS" />SMS</label><label><input type="checkbox" name="Reminders" value="Email" />Email</label><label><input type="checkbox" name="Reminders" value="In the system" />In the system</label></div></div>
         <div class="q"><span class="t">How often is PPE issued?</span>
-          <div class="opts"><label><input type="radio" name="PPE frequency" value="Monthly" />Monthly</label><label><input type="radio" name="PPE frequency" value="Quarterly" />Quarterly</label><label><input type="radio" name="PPE frequency" value="Every 6 months" />Every 6 months</label><label><input type="radio" name="PPE frequency" value="Yearly" />Yearly</label><label><input type="radio" name="PPE frequency" value="When worn out" />When worn out</label></div>
-          <span class="h">Does it differ by role? Tell us briefly.</span><input type="text" name="PPE frequency notes" /></div>
-        <div class="q"><span class="t">Is there a stocktake routine today?</span>
-          <div class="opts"><label><input type="radio" name="Stocktake today" value="Yes, regular" />Yes, regular</label><label><input type="radio" name="Stocktake today" value="Sometimes" />Sometimes</label><label><input type="radio" name="Stocktake today" value="No" />No</label></div></div>
-        <div class="q"><span class="t">Do you want stock valuation reports (what your stock is worth)?</span>
-          <div class="opts"><label><input type="radio" name="Stock valuation" value="Yes" />Yes</label><label><input type="radio" name="Stock valuation" value="No" />No</label><label><input type="radio" name="Stock valuation" value="Ask accountant" />Ask my accountant</label></div></div>
-      </div>
+          <div class="opts"><label><input type="radio" name="PPE frequency" value="Monthly" />Monthly</label><label><input type="radio" name="PPE frequency" value="Quarterly" />Quarterly</label><label><input type="radio" name="PPE frequency" value="Every 6 months" />6 months</label><label><input type="radio" name="PPE frequency" value="Yearly" />Yearly</label><label><input type="radio" name="PPE frequency" value="When worn out" />When worn out</label></div></div>
+        <div class="q"><span class="t">Tenant module: its own login, or a locked section inside the main system?</span>
+          <div class="opts"><label><input type="radio" name="Tenant module" value="Own login" />Own login</label><label><input type="radio" name="Tenant module" value="Locked section inside" />Locked section</label><label><input type="radio" name="Tenant module" value="You decide" />You decide</label></div></div>
+        <div class="q"><span class="t">What will staff use in the field?</span>
+          <div class="opts"><label><input type="checkbox" name="Devices" value="Android phones" />Android</label><label><input type="checkbox" name="Devices" value="iPhones" />iPhone</label><label><input type="checkbox" name="Devices" value="Tablets" />Tablets</label><label><input type="checkbox" name="Devices" value="Office computers only" />Office only</label></div></div>
+        <div class="q"><span class="t">Run the new system alongside your current one for a month before switching?</span>
+          <div class="opts"><label><input type="radio" name="Parallel month" value="Yes" />Yes</label><label><input type="radio" name="Parallel month" value="Shorter" />Shorter</label><label><input type="radio" name="Parallel month" value="No" />No</label></div></div>
+        <div class="q"><span class="t">Your current system's records: bring them across, or keep them as history?</span>
+          <div class="opts"><label><input type="radio" name="Old records" value="Bring across" />Bring across</label><label><input type="radio" name="Old records" value="Keep as history" />Keep as history</label><label><input type="radio" name="Old records" value="Not sure" />Not sure</label></div></div>
+        <div class="q"><span class="t">January: start with quotations and invoicing first, other modules to follow in phases?</span>
+          <div class="opts"><label><input type="radio" name="Phased start" value="Yes" />Yes</label><label><input type="radio" name="Phased start" value="Different order" />Different order</label><label><input type="radio" name="Phased start" value="Let's discuss" />Let's discuss</label></div></div>
+      </section>
 
-      <div class="panel">
-        <h2>5 · People and access</h2>
-        <div class="q"><span class="t">Who will be the Super Admin (manages users and permissions)?</span><input type="text" name="Super Admin" /></div>
+      <section>
+        <h2><span class="n">3</span>People</h2>
+        <p class="meta">Names or roles, a few words each. Leave blank if undecided.</p>
+        <div class="q"><span class="t">Who manages users and permissions (the super admin)?</span><input type="text" name="Super admin" /></div>
         <div class="q"><span class="t">Who may approve purchase and PPE requests?</span><input type="text" name="Approvers" /></div>
-        <div class="q"><span class="t">Who may record payments and export reports?</span><input type="text" name="Finance users" /></div>
-        <div class="q"><span class="t">Tenant module: own separate login, or a restricted section inside the main system?</span>
-          <div class="opts"><label><input type="radio" name="Tenant module access" value="Separate login" />Separate login</label><label><input type="radio" name="Tenant module access" value="Restricted section inside" />Restricted section inside</label><label><input type="radio" name="Tenant module access" value="You decide" />You decide</label></div>
-          <span class="h">Who may see the tenant module? (names)</span><input type="text" name="Tenant module users" /></div>
-        <div class="q"><span class="t">Which devices will staff use in the field?</span>
-          <div class="opts"><label><input type="checkbox" name="Field devices" value="Android phones" />Android phones</label><label><input type="checkbox" name="Field devices" value="iPhones" />iPhones</label><label><input type="checkbox" name="Field devices" value="Tablets" />Tablets</label><label><input type="checkbox" name="Field devices" value="Office computers only" />Office computers only</label></div>
-          <span class="h">Is signal reliable at your sites?</span>
-          <div class="opts"><label><input type="radio" name="Site signal" value="Good" />Good</label><label><input type="radio" name="Site signal" value="Patchy" />Patchy</label><label><input type="radio" name="Site signal" value="Poor" />Poor</label></div></div>
-      </div>
+        <div class="q"><span class="t">Who may see the tenant module?</span><input type="text" name="Tenant module viewers" /></div>
+      </section>
 
-      <div class="panel">
-        <h2>6 · Your current system and the changeover</h2>
-        <div class="q"><span class="t">Your current Access system's data: bring it across, keep it for reference, or leave it as history?</span>
-          <div class="opts"><label><input type="radio" name="Access data" value="Bring across" />Bring across</label><label><input type="radio" name="Access data" value="Keep for reference" />Keep for reference</label><label><input type="radio" name="Access data" value="Leave as history" />Leave as history</label><label><input type="radio" name="Access data" value="Not sure" />Not sure</label></div>
-          <span class="h">Who can export data from it?</span><input type="text" name="Access data exporter" /></div>
-        <div class="q"><span class="t">Are you comfortable running the new system alongside Access for one full month, with someone on your side checking that invoices and orders match?</span>
-          <div class="opts"><label><input type="radio" name="Parallel run" value="Yes" />Yes</label><label><input type="radio" name="Parallel run" value="Yes, but shorter" />Yes, but shorter</label><label><input type="radio" name="Parallel run" value="No" />No</label></div>
-          <span class="h">Who would do the checking?</span><input type="text" name="Parallel run checker" /></div>
-        <div class="q"><span class="t">Where should your data be stored?</span>
-          <div class="opts"><label><input type="radio" name="Data hosting" value="South Africa" />South Africa</label><label><input type="radio" name="Data hosting" value="Anywhere secure" />Anywhere secure</label><label><input type="radio" name="Data hosting" value="You advise" />You advise</label></div></div>
-        <div class="q"><span class="t">Timing: a realistic first step for January is shared quotations and invoicing with proper sign-in, running alongside Access, with the other modules following in phases. Does that work?</span>
-          <div class="opts"><label><input type="radio" name="January phased start" value="Yes" />Yes</label><label><input type="radio" name="January phased start" value="Prefer a different order" />Different order</label><label><input type="radio" name="January phased start" value="Let's discuss" />Let's discuss</label></div>
-          <span class="h">Which module matters most to you first?</span><input type="text" name="First priority module" /></div>
-      </div>
+      <section>
+        <h2><span class="n">4</span>Anything else</h2>
+        <p class="meta">Optional.</p>
+        <div class="q"><span class="t">Anything the demo didn't show that you need, or anything else on your mind</span><textarea name="Comments" placeholder="Type here…"></textarea></div>
+        <div class="q"><span class="t">Best time for a 45-minute scope call</span>
+          <div class="opts"><label><input type="checkbox" name="Call time" value="Weekday mornings" />Mornings</label><label><input type="checkbox" name="Call time" value="Weekday afternoons" />Afternoons</label><label><input type="checkbox" name="Call time" value="Evenings" />Evenings</label></div>
+          <input type="text" name="Call dates" placeholder="Dates that suit you (optional)" style="margin-top:10px" /></div>
+      </section>
 
-      <div class="panel">
-        <h2>7 · Anything else</h2>
-        <div class="q"><label class="t" for="frust">What takes the most time or frustrates you most in the current system?</label><textarea id="frust" name="Biggest frustration"></textarea></div>
-        <div class="q"><label class="t" for="reports">Which reports do you want to see every month?</label><textarea id="reports" name="Monthly reports wanted"></textarea></div>
-        <div class="q"><label class="t" for="missing">Is there anything the demo did not show that you need?</label><textarea id="missing" name="Missing from demo"></textarea></div>
-        <div class="q"><label class="t" for="other">Any other comments or questions</label><textarea id="other" name="Other comments"></textarea></div>
-        <div class="q"><span class="t">Best times for a 45-minute scope call</span>
-          <div class="opts"><label><input type="checkbox" name="Call times" value="Weekday mornings" />Weekday mornings</label><label><input type="checkbox" name="Call times" value="Weekday afternoons" />Weekday afternoons</label><label><input type="checkbox" name="Call times" value="Evenings" />Evenings</label></div>
-          <span class="h">Specific dates that suit you</span><input type="text" name="Call dates" /></div>
-      </div>
-
-      <div class="note" style="margin-bottom:14px">Your answers go straight to Ndumiso at Embark Digitals by email and are used only to scope your system. Nothing you send here is published.</div>
-      <div class="err" id="ferr">Please fill in your name and email so we can reply.</div>
+      <div class="note">Your answers go straight to Ndumiso at Embark Digitals and are used only to scope your system.</div>
       <button class="btn" type="submit" id="send">Send to Embark →</button>
-      <div class="foot">JNL TRADERS · SCOPE FORM · EMBARK DIGITALS · NOVEMBER 2026</div>
+      <div class="foot">JNL TRADERS · SCOPE CHECKLIST · EMBARK DIGITALS</div>
     </form>
   </div>
 </div>
@@ -200,44 +155,23 @@
       document.getElementById('thanks').classList.remove('hidden');
       return;
     }
-    // Progress: count answered questions (named groups) across the form.
+    // Progress counts the tap questions only (radio/checkbox groups), not optional text.
     var groups = {};
-    Array.prototype.forEach.call(form.querySelectorAll('input, textarea'), function (el) {
-      if (!el.name || el.name === 'botcheck' || el.type === 'hidden') return;
-      groups[el.name] = true;
+    Array.prototype.forEach.call(form.querySelectorAll('input[type=radio], input[type=checkbox]'), function (el) {
+      if (el.name && el.name !== 'botcheck') groups[el.name] = true;
     });
     var total = Object.keys(groups).length;
-    function answered() {
+    function update() {
       var n = 0;
       Object.keys(groups).forEach(function (name) {
-        var els = form.querySelectorAll('[name="' + name.replace(/"/g, '\\"') + '"]');
-        var done = false;
-        Array.prototype.forEach.call(els, function (el) {
-          if ((el.type === 'radio' || el.type === 'checkbox') && el.checked) done = true;
-          else if (el.type === 'file' && el.files && el.files.length) done = true;
-          else if (el.type !== 'radio' && el.type !== 'checkbox' && el.type !== 'file' && el.value.trim()) done = true;
-        });
-        if (done) n++;
+        if (form.querySelector('input[name="' + name.replace(/"/g, '\\"') + '"]:checked')) n++;
       });
-      return n;
-    }
-    function update() {
-      var n = answered();
       document.getElementById('pbar').style.width = Math.round((n / total) * 100) + '%';
-      document.getElementById('ptext').textContent = n + ' of ' + total + ' answered';
+      document.getElementById('ptext').textContent = n + ' of ' + total + ' ticked';
     }
-    form.addEventListener('input', update);
     form.addEventListener('change', update);
     update();
-    var keyOk = document.getElementById('access_key').value.indexOf('PENDING') === -1;
-    if (!keyOk) { var b = document.getElementById('send'); b.disabled = true; b.textContent = 'Form not activated yet'; }
-    form.addEventListener('submit', function (e) {
-      if (!keyOk) { e.preventDefault(); return; }
-      var name = form.querySelector('#name').value.trim();
-      var email = form.querySelector('#email').value.trim();
-      var ok = name && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      document.getElementById('ferr').style.display = ok ? 'none' : 'block';
-      if (!ok) { e.preventDefault(); form.querySelector(name ? '#email' : '#name').focus(); return; }
+    form.addEventListener('submit', function () {
       var btn = document.getElementById('send');
       btn.disabled = true; btn.textContent = 'Sending…';
     });
