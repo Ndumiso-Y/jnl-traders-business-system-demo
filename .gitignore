@@ -32,3 +32,6 @@ internal/
 
 # internal marketing material
 Promotion/
+
+# production planning (confidential: commercial inputs, client confirmations) - kept out of the public repo
+docs/production-planning/
